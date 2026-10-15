@@ -1,8 +1,10 @@
-\documentclass[12pt]{article}
+\documentclass[12pt,a4paper]{article}
 
 \usepackage{graphicx}
 \usepackage{url}
 \usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[brazil]{babel}
 \usepackage{amsmath} % Para fórmulas matemáticas
 \usepackage{amssymb} % Para símbolos matemáticos
 \usepackage{geometry} % Para ajustar as margens
@@ -11,9 +13,30 @@
 \usepackage{hyperref} % Links
 \usepackage{times}
 \usepackage{tabularx}
+\usepackage{longtable}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{listings}
+\usepackage{indentfirst}
+\usepackage{setspace}
 
 \usepackage{xcolor}
 \newcommand\todoe[1]{\textcolor{red}{evandro:#1}}
+
+\definecolor{codebg}{rgb}{0.97,0.97,0.97}
+\definecolor{codeframe}{rgb}{0.82,0.82,0.82}
+\lstset{
+  basicstyle=\ttfamily\footnotesize,
+  backgroundcolor=\color{codebg},
+  frame=single,
+  rulecolor=\color{codeframe},
+  breaklines=true,
+  breakatwhitespace=true,
+  showstringspaces=false,
+  tabsize=2,
+  keepspaces=true,
+  columns=fullflexible
+}
 
 \usepackage{tocloft}      
 \renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
@@ -26,7 +49,7 @@
 \setlength{\cftsubsecindent}{0em}
 \setlength{\cftsubsubsecindent}{0em}
 
-% Definição das margens (conforme especificado no template SBC)
+% Definição das margens (padrão ABNT / Relatório Técnico UTFPR)
 \geometry{
   top=3.0cm,
   bottom=2.0cm,
@@ -35,7 +58,7 @@
 }
 
 \usepackage{fancyhdr} % Para remover cabeçalho e rodapé
-\pagestyle{empty} % Remove cabeçalho e rodapé de todas as páginas
+\pagestyle{empty} % Remove cabeçalho e rodapé das páginas pré-textuais
 
 \sloppy % Evita quebras de linha muito feias
 
@@ -45,7 +68,8 @@
 
 % --- Autor ---
 \newcommand{\autor}{Gabriella Marreto Rodrigues}
-\newcommand{\citacaoAutor}{MARRETO, Gabriella} 
+\newcommand{\autorUppercase}{\MakeUppercase{\autor}}
+\newcommand{\citacaoAutor}{RODRIGUES, Gabriella Marreto} 
 \newcommand{\mail}{gabriella.21@alunos.utfpr.edu.br}
 
 % --- Título ---
@@ -54,36 +78,33 @@
 \newcommand{\titulotraduzido}{A Cache-First Architecture for Large-Scale PWA Scheduling Applications Focused on the Micro-entrepreneur}
 
 % --- Resumo e Abstract ---
-\newcommand{\textoResumo}{O microempreendedor brasileiro enfrenta desafios diários na gestão de agendamentos, recorrendo a métodos ineficientes como WhatsApp. Soluções de mercado existentes são complexas e caras (ex: Booksy) ou modelos \textit{freemium} limitados (ex: Reservio), além de não serem otimizadas para a realidade da conectividade precária de algumas regiões do país. Este trabalho propõe uma arquitetura \textit{Cache-First}, utilizando Supabase (Postgres, Auth com RLS, Edge Functions), Upstash (Redis) e Resend (Email). Essa solução garante alta performance e baixo consumo de dados. A arquitetura demonstra ser escalável, segura através de transações ACID e RLS, e economicamente viável, entregando uma experiência de usuário rápida e profissionalizando o serviço do de Microempreendedores com um baixo custo operacional.}
+\newcommand{\textoResumo}{O microempreendedor brasileiro enfrenta desafios diários na gestão de agendamentos, recorrendo frequentemente a métodos manuais e ineficientes, como agendas de papel e trocas de mensagens via WhatsApp. Soluções de mercado existentes apresentam-se como plataformas corporativas complexas e de alto custo (como Booksy e Trinks), modelos \textit{freemium} severamente limitados (como Reservio) ou aplicações web pesadas que não são otimizadas para a realidade da conectividade móvel precária em diversas regiões do país. Este trabalho apresenta o projeto, a implementação e a validação do Lume Agenda, um \textit{Progressive Web App} (PWA) de agendamento online fundamentado em uma arquitetura \textit{serverless Cache-First} na borda, utilizando Next.js (Vercel), Supabase (PostgreSQL, Auth com Row Level Security e Edge Functions), Upstash (Redis) e Resend (e-mails transacionais). A arquitetura adota os padrões \textit{Cache-Aside} para leituras em milissegundos com baixo consumo de dados e \textit{Write-Invalidate} acoplado a transações ACID, bloqueios consultivos, restrições espaciais (\texttt{btree\_gist}), chaves de idempotência e fila \textit{Transactional Outbox}. Os resultados demonstram que a solução garante integridade contra condições de corrida, isolamento estrito multi-tenant e viabilidade financeira em larga escala, atingindo um custo operacional estimado de R\$ 0,068 por prestador ao mês.}
 
-\newcommand{\textoAbstract}{azilian micro-entrepreneurs face daily challenges in managing appointments, often relying on inefficient methods such as WhatsApp. Existing market solutions are either complex and expensive (e.g., Booksy) or rely on limited \textit{freemium} models (e.g., Reservio), and they are not optimized for the reality of poor connectivity in some regions of the country. This work proposes a Cache-First architecture using Supabase (Postgres, Auth with RLS, Edge Functions), Upstash (Redis), and Resend (Email). This solution ensures high performance and low data consumption. The architecture proves to be scalable, secure through ACID transactions and RLS, and economically viable, delivering a fast user experience and professionalizing the service of micro-entrepreneurs with low operational costs.}
+\newcommand{\textoAbstract}{Brazilian micro-entrepreneurs face daily challenges in managing appointments, frequently relying on manual and inefficient methods such as paper schedules and WhatsApp messages. Existing market solutions are either expensive enterprise platforms (e.g., Booksy, Trinks), restricted \textit{freemium} models (e.g., Reservio), or data-heavy web applications not optimized for poor mobile connectivity across the country. This work presents the design, implementation, and validation of Lume Agenda, a scheduling \textit{Progressive Web App} (PWA) built on an edge \textit{Cache-First} serverless architecture using Next.js (Vercel), Supabase (PostgreSQL, Auth with Row Level Security, and Edge Functions), Upstash (Redis), and Resend (transactional emails). The architecture combines \textit{Cache-Aside} for sub-100ms reads with minimal data payloads and \textit{Write-Invalidate} coupled with ACID transactions, advisory locks, spatial exclusion constraints (\texttt{btree\_gist}), idempotency keys, and a \textit{Transactional Outbox} queue. Results show that the solution ensures concurrency integrity against race conditions, strict multi-tenant isolation, and large-scale economic viability at an estimated operational cost of R\$ 0.068 per provider per month.}
 
 % --- Outras Informações ---
-\newcommand{\orientador}{Prof. Dr. Nome do Orientador}
-\newcommand{\datadeaprovacao}{Dia de Mês de 2025}
+\newcommand{\orientador}{Prof. Dr. Evandro Kuszera}
+\newcommand{\datadeaprovacao}{Julho de 2026}
 \newcommand{\instituicao}{UNIVERSIDADE TECNOLÓGICA FEDERAL DO PARANÁ}
-\newcommand{\ano}{\the\year{}}
+\newcommand{\coordenadoria}{COORDENADORIA DO CURSO DE ENGENHARIA DE SOFTWARE}
+\newcommand{\ano}{2026}
 
 % --- Membros da Banca ---
-\newcommand{\membroUm}{Prof. Dr. Nome do Membro 1}
+\newcommand{\membroUm}{Prof. Dr. Evandro Kuszera}
 \newcommand{\titulacaoMembroUm}{Doutorado}
-\newcommand{\instituicaoMembroUm}{Instituição do Membro 1}
+\newcommand{\instituicaoMembroUm}{Universidade Tecnológica Federal do Paraná}
 \newcommand{\membroDois}{Prof. Dr. Nome do Membro 2}
 \newcommand{\titulacaoMembroDois}{Doutorado}
-\newcommand{\instituicaoMembroDois}{Instituição do Membro 2}
+\newcommand{\instituicaoMembroDois}{Universidade Tecnológica Federal do Paraná}
 \newcommand{\membroTres}{Prof. Dr. Nome do Membro 3}
 \newcommand{\titulacaoMembroTres}{Doutorado}
-\newcommand{\instituicaoMembroTres}{Instituição do Membro 3}
+\newcommand{\instituicaoMembroTres}{Universidade Tecnológica Federal do Paraná}
 
 % ===================================================================
-% CONFIGURAÇÃO DO CABEÇALHO DO ARTIGO (SBC TEMPLATE)
-% Estas informações agora utilizam os comandos definidos acima.
+% CONFIGURAÇÃO DO CABEÇALHO DO DOCUMENTO
 % ===================================================================
 
-% AJUSTE 1: O comando \title agora usa a variável \titulo.
 \title{\titulo}
-
-% AJUSTE 2: O comando \author agora usa a variável \autor.
 \author{\autor}
 
 \renewcommand{\contentsname}{SUMÁRIO}
@@ -92,104 +113,59 @@
 
 \begin{document}
 
-% Capa
+% ===================================================================
+% CAPA (PADRÃO RELATÓRIO TÉCNICO UTFPR-DV)
+% ===================================================================
 \begin{titlepage}
 \centering
-{\large \instituicao} \\
-\vspace*{4cm}
-{\large \autor \par}
-\vspace{6cm}
-{\large \tituloUppercase \par}
+{\large \textbf{\instituicao}} \\[0.2cm]
+{\large \textbf{\coordenadoria}} \\
+\vspace*{3.0cm}
+{\large \textbf{\autorUppercase} \par}
+\vspace{3.5cm}
+{\large \textbf{\tituloUppercase} \par}
+\vspace{2.5cm}
+{\large \textbf{RELATÓRIO TÉCNICO} \par}
+\vspace{0.3cm}
+{\large \textbf{TCC 2} \par}
 \vspace*{\fill}
-{\large DOIS VIZINHOS \par}
-{\large \ano \par}
+{\large \textbf{DOIS VIZINHOS} \par}
+{\large \textbf{\ano} \par}
 \end{titlepage}
 
 \newpage
 \pagestyle{empty}
 
-% Folha de Rosto
+% ===================================================================
+% FOLHA DE ROSTO (PADRÃO RELATÓRIO TÉCNICO UTFPR-DV)
+% ===================================================================
 \begin{titlepage}
 \centering
-{\large \autor \par}
-\vspace{6cm}
-{\large \tituloUppercase \par}
-\vspace{1cm}
-{\large \textbf{\titulotraduzido} \par}
-\vspace{4cm}
+{\large \textbf{\autorUppercase} \par}
+\vspace{4.5cm}
+{\large \textbf{\tituloUppercase} \par}
+\vspace{3.5cm}
 
 \hfill
-\parbox[t]{8cm}{
-
-{Trabalho de Conclusão de Curso de Graduação apresentado como requisito parcial para a obtenção do título de Bacharel em Engenharia de Software, Universidade Tecnológica Federal do Paraná (UTFPR). \par}
-\vspace{0.5cm}
-{Orientador(a): Prof. Dr. Evandro Kuszera \par}
+\parbox[t]{8.5cm}{
+\justifying
+{Relatório técnico apresentado como requisito parcial à obtenção do título de Bacharel em Engenharia de Software, da Universidade Tecnológica Federal do Paraná. \par}
+\vspace{0.6cm}
+{Orientador: \orientador \par}
 }
 
 \vspace*{\fill}
 
-{\large DOIS VIZINHOS \par}
-{\large \ano \par} 
-
-{
-\licencaBySa 
-}
-
-\vspace{-1.5cm}
-
+{\large \textbf{DOIS VIZINHOS} \par}
+{\large \textbf{\ano} \par} 
 \end{titlepage}
 
 \newpage
 \pagestyle{empty}
 
-% Folha de Aprovação
-\begin{titlepage}
-\centering
-{\large \autor \par}
-\vspace{1.5cm}
-{\large \tituloUppercase \par}
-\vspace{2cm}
-\hfill
-\parbox[t]{8cm}{
-{Trabalho de Conclusão de Curso de Graduação apresentado como requisito para obtenção do título de Bacharel em Engenharia de Software, Universidade Tecnológica Federal do Paraná (UTFPR). \par}
-}
-
-\vspace{1.5cm}
-
-{Data de aprovação: \datadeaprovacao \par}
-\vspace{1.5cm}
-\hrulefill 
-%\vspace{-0.3cm}
-
-{\membroUm}\\
-{\titulacaoMembroUm}\\
-{\instituicaoMembroUm}
-\vspace{1cm}
-
-\hrulefill 
-%\vspace{-0.3cm}
-
-{\membroDois} \\
-{\titulacaoMembroDois} \\
-{\instituicaoMembroDois} \\
-\vspace{1cm}
-
-\hrulefill 
-%\vspace{-0.3cm}
-
-{ \membroTres} \\
-{ \titulacaoMembroTres} \\
-{ \instituicaoMembroTres} \\
-
-\vspace*{\fill}
-{\large DOIS VIZINHOS \par}
-{\large \ano \par}
-\end{titlepage}
-
-\newpage
-\pagestyle{empty}
-
-% Resumo
+% ===================================================================
+% RESUMO E ABSTRACT
+% ===================================================================
 \centering
 { \textbf{RESUMO} \par}
 \vspace{1cm}
@@ -200,12 +176,11 @@
 
 \vspace{1cm}
 \noindent
-Palavras-chave: Agendamento Online; PWA; Arquitetura Cache-First; Supabase; Microempreendedor (MEI).
+\textbf{Palavras-chave:} Agendamento Online; Progressive Web App (PWA); Arquitetura Cache-First; Supabase; Row Level Security (RLS); Microempreendedor Individual (MEI).
 
 \newpage
 \pagestyle{empty}
 
-% Abstract
 \centering
 { \textbf{ABSTRACT} \par}
 \vspace{1cm}
@@ -216,269 +191,1031 @@ Palavras-chave: Agendamento Online; PWA; Arquitetura Cache-First; Supabase; Micr
 
 \vspace{1cm}
 \noindent
-Keywords: Online Scheduling; PWA; Cache-First Architecture; Supabase; Micro-entrepreneur (MEI).
+\textbf{Keywords:} Online Scheduling; Progressive Web App (PWA); Cache-First Architecture; Supabase; Row Level Security (RLS); Micro-entrepreneur (MEI).
 
 \newpage
 \pagestyle{empty}
 
+% ===================================================================
+% LISTA DE ILUSTRAÇÕES E LISTA DE QUADROS
+% ===================================================================
+\centering
+{\textbf{LISTA DE ILUSTRAÇÕES} \par}
+\vspace{0.8cm}
+\justifying
+\noindent
+Figura 1 -- Arquitetura de componentes e fluxo de dados da solução Cache-First \dotfill \pageref{arquitetura} \\
+Figura 2 -- Diagrama de Casos de Uso (UML) do ecossistema de agendamento \dotfill \pageref{fig:casos_uso} \\
+Figura 3 -- Diagrama de sequência do fluxo de consulta de disponibilidade (Cache-Aside) \dotfill \pageref{fig:seq_leitura} \\
+Figura 4 -- Diagrama de sequência do fluxo de realização de agendamento transacional (ACID) \dotfill \pageref{fig:seq_escrita} \\
+Figura 5 -- Diagrama de sequência do fluxo de cancelamento autônomo por token \dotfill \pageref{fig:seq_cancelamento} \\
+Figura 6 -- Diagrama Entidade-Relacionamento (DER) da camada de persistência \dotfill \pageref{fig:der_banco} \\
+Figura 7 -- Interface de listagem e ativação de grupos de horários (Visão do Prestador) \dotfill \pageref{fig:config_regras_home} \\
+Figura 8 -- Interface de configuração detalhada de intervalos semanais (Visão do Prestador) \dotfill \pageref{fig:config_regras_detalhes} \\
+Figura 9 -- Interface pública de agendamento do cliente final em três etapas (Mobile-First) \dotfill \pageref{fig:agendamento}
+
+\vspace{1.2cm}
+\centering
+{\textbf{LISTA DE QUADROS} \par}
+\vspace{0.8cm}
+\justifying
+\noindent
+Quadro 1 -- Matriz de requisitos funcionais do sistema de agendamento \dotfill \pageref{quadro:requisitos_funcionais} \\
+Quadro 2 -- Matriz de requisitos não-funcionais e metas de qualidade \dotfill \pageref{quadro:requisitos_nao_funcionais} \\
+Quadro 3 -- Matriz comparativa de soluções de mercado e trabalhos relacionados \dotfill \pageref{quadro:trabalhos_relacionados} \\
+Quadro 4 -- Dicionário de dados das tabelas de persistência relacional no PostgreSQL \dotfill \pageref{quadro:dicionario_dados} \\
+Quadro 5 -- Catálogo de endpoints serverless (Supabase Edge Functions) implementados \dotfill \pageref{quadro:catalogo_endpoints} \\
+Quadro 6 -- Matriz de invalidação de cache (Write-Invalidate) por mutação de domínio \dotfill \pageref{quadro:invalidacao_cache} \\
+Quadro 7 -- Estimativa de custos operacionais mensais para escala de 100.000 prestadores \dotfill \pageref{quadro:custos_escala} \\
+Quadro 8 -- Síntese de verificação e validação dos requisitos não-funcionais \dotfill \pageref{quadro:validacao_rnf} \\
+Quadro 9 -- Cronograma de atividades executadas no ciclo do TCC 2 \dotfill \pageref{tab:cronograma_detalhado}
+
+\newpage
+\pagestyle{empty}
+
+% ===================================================================
+% LISTA DE SIGLAS E LISTA DE ACRÔNIMOS
+% ===================================================================
+\centering
+{\textbf{LISTA DE SIGLAS} \par}
+\vspace{0.6cm}
+\justifying
+\noindent
+\begin{tabularx}{\textwidth}{@{}lX@{}}
+\textbf{ACID} & \textit{Atomicity, Consistency, Isolation, Durability} (Atomicidade, Consistência, Isolamento e Durabilidade) \\
+\textbf{API} & \textit{Application Programming Interface} (Interface de Programação de Aplicações) \\
+\textbf{CDN} & \textit{Content Delivery Network} (Rede de Distribuição de Conteúdo) \\
+\textbf{CORS} & \textit{Cross-Origin Resource Sharing} (Compartilhamento de Recursos de Origem Cruzada) \\
+\textbf{CRUD} & \textit{Create, Read, Update, Delete} (Criar, Ler, Atualizar e Deletar) \\
+\textbf{CSS} & \textit{Cascading Style Sheets} (Folhas de Estilo em Cascatas) \\
+\textbf{DDL} & \textit{Data Definition Language} (Linguagem de Definição de Dados) \\
+\textbf{DER} & Diagrama Entidade-Relacionamento \\
+\textbf{DML} & \textit{Data Manipulation Language} (Linguagem de Manipulação de Dados) \\
+\textbf{DTO} & \textit{Data Transfer Object} (Objeto de Transferência de Dados) \\
+\textbf{GiST} & \textit{Generalized Search Tree} (Árvore de Busca Generalizada) \\
+\textbf{HTTP} & \textit{Hypertext Transfer Protocol} (Protocolo de Transferência de Hipertexto) \\
+\textbf{IBGE} & Instituto Brasileiro de Geografia e Estatística \\
+\textbf{JWT} & \textit{JSON Web Token} \\
+\textbf{MAU} & \textit{Monthly Active Users} (Usuários Ativos Mensais) \\
+\textbf{MEI} & Microempreendedor Individual \\
+\textbf{MVP} & \textit{Minimum Viable Product} (Produto Mínimo Viável) \\
+\textbf{PII} & \textit{Personally Identifiable Information} (Informações de Identificação Pessoal) \\
+\textbf{PKCE} & \textit{Proof Key for Code Exchange} \\
+\textbf{PME} & Pequenas e Médias Empresas \\
+\textbf{PWA} & \textit{Progressive Web App} (Aplicação Web Progressiva) \\
+\textbf{RF} & Requisito Funcional \\
+\textbf{RLS} & \textit{Row Level Security} (Segurança em Nível de Linha) \\
+\textbf{RNF} & Requisito Não-Funcional \\
+\textbf{RPC} & \textit{Remote Procedure Call} (Chamada de Procedimento Remoto) \\
+\textbf{SGBD} & Sistema de Gerenciamento de Banco de Dados \\
+\textbf{SQL} & \textit{Structured Query Language} (Linguagem de Consulta Estruturada) \\
+\textbf{SSR} & \textit{Server-Side Rendering} (Renderização no Lado do Servidor) \\
+\textbf{TBT} & \textit{Total Blocking Time} (Tempo Total de Bloqueio) \\
+\textbf{TCC} & Trabalho de Conclusão de Curso \\
+\textbf{TIC} & Tecnologias da Informação e Comunicação \\
+\textbf{TTL} & \textit{Time-To-Live} (Tempo de Vida) \\
+\textbf{UI} & \textit{User Interface} (Interface do Usuário) \\
+\textbf{UML} & \textit{Unified Modeling Language} (Linguagem de Modelagem Unificada) \\
+\textbf{URL} & \textit{Uniform Resource Locator} (Localizador Uniforme de Recursos) \\
+\textbf{UUID} & \textit{Universally Unique Identifier} (Identificador Único Universal) \\
+\textbf{UX} & \textit{User Experience} (Experiência do Usuário) \\
+\end{tabularx}
+
+\vspace{1.0cm}
+\centering
+{\textbf{LISTA DE ACRÔNIMOS} \par}
+\vspace{0.6cm}
+\justifying
+\noindent
+\begin{tabularx}{\textwidth}{@{}lX@{}}
+\textbf{JSON} & \textit{JavaScript Object Notation} \\
+\textbf{REST} & \textit{Representational State Transfer} \\
+\textbf{SEBRAE} & Serviço Brasileiro de Apoio às Micro e Pequenas Empresas \\
+\textbf{UTFPR} & Universidade Tecnológica Federal do Paraná \\
+\end{tabularx}
+
+\newpage
+\pagestyle{empty}
+
+% ===================================================================
 % SUMÁRIO
+% ===================================================================
 \centering
 { \textbf{SUMÁRIO} \par}
-\vspace{1cm}
+\vspace{0.8cm}
 \justifying
 
 \renewcommand{\contentsname}{}
-\pdfbookmark[0]{\contentsname}{toc}
+\pdfbookmark[0]{SUMÁRIO}{toc}
 \tableofcontents
-\maketitle
 
 \newpage
 \pagestyle{plain} 
 \pagenumbering{arabic}
+\onehalfspacing
 
 %====================================================================
+% 1 INTRODUÇÃO
+%====================================================================
 
-\section{Introdução}
+\section{INTRODUÇÃO}
 \label{sec:introducao}
-
-O Brasil vive um cenário econômico onde mais de 14,6 milhões de Microempreendedores Individuais (MEIs) \cite{ibge_noticias} sustentam a base da pirâmide de serviços. Para esse contingente massivo, a gestão do tempo não é apenas uma tarefa administrativa, mas um gargalo operacional. A realidade, no entanto, é arcaica: a dependência de métodos manuais, como agendas de papel, ou a troca trabalhosa de mensagens via WhatsApp, resulta em ineficiência crônica, erros humanos como choque de horários e perda direta de faturamento \cite{gov_mapa_empresas}.
-
-Apesar da vasta oferta de ferramentas digitais, existe uma lacuna no mercado. As soluções de agendamento atuais falham em atender o MEI brasileiro, dividindo-se em categorias que ignoram a realidade financeira ou técnica desse público \cite{sebrae_digital}:
-
-\begin{itemize}
-    \item \textbf{Sistemas Enterprise/Complexos:} Plataformas como Booksy\footnote{https://booksy.com/pt-br/} e Trinks\footnote{https://negocios.trinks.com/planos/} são projetadas para PMEs (salões e clínicas com múltiplos funcionários), focando em gestão de estoque e comissões. O custo de assinatura (frequentemente acima de R\$ 99,00/mês) torna-se proibitivo para o profissional autônomo.
-    \item \textbf{Modelos "Isca" (Freemium):} Ferramentas como Reservio\footnote{https://www.reservio.com/pt-br} e Minha Agenda Virtual atraem pelo "gratuito", mas impõem limitações severas (como teto de agendamentos mensais) que inviabilizam a operação real, servindo apenas como barreiras artificiais para forçar um \textit{upgrade}.
-    \item \textbf{Softwares "Data-Heavy":} A grande maioria das aplicações web atuais (ex: Prit, Gendo) pressupõe uma conexão de banda larga estável. Elas não são otimizadas para redes móveis instáveis, gerando alta latência e consumo excessivo de dados, penalizando o usuário que possui franquias limitadas.
-\end{itemize}
-
-Este último ponto é crucial e frequentemente negligenciado. Dados da pesquisa TIC Domicílios 2023\cite{cetic_tic_domicilios_2024} apontam que 57\% da população brasileira vive com acesso precário à internet, com o custo do gigabyte forçando um racionamento de uso.
-
-Diante da instabilidade da rede, uma resposta comum da engenharia de software seria a adoção de uma arquitetura \textit{Offline-First} (sincronização de banco de dados local). No entanto, essa abordagem introduz uma complexidade técnica massiva relacionada à resolução de conflitos de dados (o famoso "sync hell") e, de forma contraditória, pode consumir mais dados móveis durante os processos de sincronização do que uma aplicação online bem otimizada.
-
-Portanto, este trabalho propõe o desenvolvimento de um \textit{Progressive Web App} (PWA) de agendamento fundamentado em uma arquitetura \textbf{Cache-First}. Ao invés de complexos bancos locais, a solução utiliza estratégias de cache na borda (\textit{Edge Computing}) para entregar respostas em milissegundos com payloads de poucos kilobytes. O objetivo é democratizar o acesso à tecnologia de agendamento, oferecendo uma ferramenta que seja economicamente viável, tecnicamente performática em redes 3G/4G e capaz de profissionalizar a jornada do empreendedor sem a complexidade desnecessária de soluções tradicionais \cite{sebrae_pr}.
-
-%====================================================================
-
-\section{Arquitetura de Sistema Proposta}
 \justifying
 
-A arquitetura proposta configura-se como um sistema distribuído \textit{serverless}, projetado para minimizar a latência e custos operacionais. O sistema adota uma estratégia híbrida, utilizando o padrão \textbf{\textit{Cache-Aside}} para leituras e \textbf{\textit{Write-Invalidate}} transacional para escritas. A Figura \ref{arquitetura} ilustra os componentes.
+O Brasil apresenta um cenário socioeconômico no qual mais de 14,6 milhões de Microempreendedores Individuais (MEIs) sustentam a base da pirâmide de prestação de serviços e geração de renda \cite{ibge_noticias, ibge_educa_mei}. Para esse contingente expressivo de profissionais autônomos --- que atuam em segmentos como estética, saúde, manutenção, consultoria e educação ---, a administração da agenda de atendimentos não constitui uma mera formalidade burocrática, mas um determinante crítico de produtividade e faturamento \cite{sebrae_tempo, money_radar}. Na prática cotidiana, contudo, a gestão de horários ainda é predominantemente conduzida por meio de artefatos analógicos, como cadernos de papel, ou pela troca manual e assíncrona de mensagens em aplicativos de comunicação instantânea como o WhatsApp \cite{simples_agenda, agendor_whatsapp, gov_mapa_empresas}. Esse processo informal exige que o profissional interrompa atendimentos presenciais para negociar disponibilidade, ocasionando erros humanos recorrentes, sobreposição de marcações (\textit{double booking}), esquecimentos e perda direta de receita.
+
+Nesse contexto, este trabalho apresenta o projeto, a implementação e a validação do \textbf{Lume Agenda}, uma aplicação web progressiva (\textit{Progressive Web App} -- PWA) de agendamento online fundamentada em uma arquitetura distribuída \textit{Cache-First} executada na borda (\textit{Edge Computing}). Ao contrário de abordagens tradicionais monolíticas ou de arquiteturas \textit{Offline-First} baseadas em sincronização complexa de bancos de dados locais no dispositivo, a solução proposta utiliza o ecossistema Next.js (hospedado na Vercel) acoplado ao Supabase (PostgreSQL, Auth com \textit{Row Level Security} e Edge Functions), Upstash (Redis) e Resend (mensageria transacional). O escopo do presente relatório técnico abrange desde a especificação formal de requisitos, modelagem de processos e arquitetura de persistência transacional até a implementação do protótipo funcional e a avaliação experimental de desempenho, segurança multi-tenant, integridade sob concorrência e viabilidade financeira em larga escala.
+
+\subsection{Objetivo Geral}
+\label{subsec:objetivo_geral}
+
+Projetar, implementar e validar uma arquitetura de software \textit{Cache-First} aplicada a um \textit{Progressive Web App} (PWA) de agendamento online voltado ao Microempreendedor Individual (MEI), visando assegurar baixa latência de leitura em redes móveis instáveis, integridade transacional contra condições de corrida, isolamento seguro de dados multi-tenant e viabilidade econômica em larga escala.
+
+\subsection{Objetivos Específicos}
+\label{subsec:objetivos_especificos}
+
+\begin{itemize}
+    \item Elicitar e especificar os requisitos funcionais e não-funcionais do sistema, bem como modelar os processos de negócio por meio de Diagrama de Casos de Uso e Diagramas de Sequência para as jornadas do Prestador de Serviço e do Cliente Final;
+    \item Projetar e implementar a camada de persistência relacional no SGBD PostgreSQL (Supabase), incorporando políticas restritivas de segurança em nível de linha (\textit{Row Level Security} -- RLS), restrições espaciais contra sobreposição temporal de agendamentos (\texttt{btree\_gist}) e funções remotas (RPC) transacionais ACID;
+    \item Desenvolver uma camada de orquestração \textit{serverless} em Supabase Edge Functions que isole integralmente o banco de dados do cliente web e implemente os padrões \textit{Cache-Aside} (leitura em memória via Upstash Redis) e \textit{Write-Invalidate} (invalidação seletiva pós-commit);
+    \item Construir um mecanismo resiliente e assíncrono de notificações por e-mail fundamentado no padrão \textit{Transactional Outbox} integrado ao serviço Resend, garantindo o envio de confirmações e a autonomia de cancelamento pelo cliente mediante token criptográfico único (\texttt{cancellation\_token});
+    \item Desenvolver a interface \textit{Mobile-First} instalável (PWA) em Next.js e avaliar experimentalmente a solução quanto à latência de resposta (\textit{Cache Hit} versus \textit{Cache Miss}), consistência transacional sob requisições concorrentes, métricas de qualidade frontend (Google Lighthouse e \textit{Total Blocking Time}) e custo operacional unitário para uma escala de 100.000 prestadores.
+\end{itemize}
+
+\subsection{Descrição da Regra de Negócio}
+\label{subsec:regra_negocio}
+
+O ecossistema modelado atende dois atores principais com jornadas e níveis de permissão estritamente distintos: o \textbf{Prestador de Serviço} (microempreendedor autenticado) e o \textbf{Cliente Final} (usuário anônimo que deseja agendar um atendimento). A premissa central da regra de negócio consiste em eliminar qualquer fricção cognitiva ou barreira de entrada para o cliente final, ao mesmo tempo em que oferece controle operacional completo e automatizado ao prestador.
+
+Na visão administrativa, o Prestador de Serviço autentica-se via Supabase Auth e configura seu perfil profissional, definindo um identificador textual único e amigável (\texttt{public\_slug}, por exemplo, \texttt{luciane-nails}) que compõe sua URL pública de atendimento. A disponibilidade de trabalho é organizada de maneira hierárquica por meio de Grupos de Regras de Disponibilidade (\texttt{AvailabilityRuleGroup}), tais como ``Horário Comercial'' ou ``Plantão de Fim de Semana''. Dentro de cada grupo, o prestador cadastra intervalos de atendimento (\texttt{AvailabilityRule}) vinculados aos dias da semana (\texttt{day\_of\_week} de 1 a 7, com horários de início \texttt{start\_time} e término \texttt{end\_time}). Como regra de integridade de domínio, o sistema impede a ativação simultânea de grupos que possuam conflito de dias da semana ou intervalos sobrepostos. Para situações atípicas, o prestador registra Exceções de Disponibilidade (\texttt{AvailabilityOverride}), que atuam com precedência sobre as regras semanais para bloquear períodos específicos (\texttt{is\_available = false}, como consultas médicas ou folgas) ou abrir horários extras (\texttt{is\_available = true}).
+
+Na visão pública, o Cliente Final acessa o link do prestador sem necessidade de realizar cadastro prévio, criar senha ou efetuar login. Ao selecionar uma data no calendário, o sistema calcula e retorna os horários livres resultantes da combinação entre grupos ativos, regras semanais, exceções aplicáveis e agendamentos já confirmados (\texttt{status = 'CONFIRMED'}). O cliente conclui a reserva em no máximo três etapas informando apenas nome, e-mail e telefone. No momento da confirmação, o backend executa uma transação atômica que vincula ou cria o registro do cliente de forma isolada por prestador, valida a inexistência de choque de horários em tempo real, persiste o agendamento com um identificador único de cancelamento (\texttt{cancellation\_token} no formato UUID v4), invalida imediatamente o cache do dia correspondente no Redis e registra o evento de envio de e-mail. A partir do e-mail de confirmação recebido, o próprio cliente pode cancelar sua reserva a qualquer momento clicando no link exclusivo, ação que altera o status para \texttt{CANCELLED} (preservando o histórico para auditoria) e libera instantaneamente o horário no cache público para novos clientes.
+
+\subsection{Justificativa/Contextualização}
+\label{subsec:justificativa}
+
+A relevância técnica e socioeconômica deste trabalho fundamenta-se na lacuna existente entre as soluções de agendamento disponíveis no mercado e a realidade operacional, financeira e de infraestrutura de rede enfrentada pelo MEI brasileiro \cite{sebrae_digital, sebrae_pr, sebrae_recorde}. Conforme demonstrado por Pressman e Maxim \cite{pressman2021}, a qualidade de um sistema de software é medida por sua adequação ao contexto real de seus usuários e por sua capacidade de resolver problemas de domínio sem impor complexidade acidental.
+
+Uma investigação das plataformas comerciais existentes permite agrupá-las em três categorias que falham em atender o microempreendedor individual:
+\begin{enumerate}
+    \item \textbf{Sistemas Corporativos Complexos (Focados em PMEs):} Plataformas como Booksy \cite{booksy_br, booksy_pricing} e Trinks \cite{trinks_planos, trinks_home} são projetadas para salões, barbearias e clínicas de médio porte com múltiplos profissionais, incorporando módulos densos de controle de estoque, fluxo de caixa e rateio de comissões. Além da elevada carga cognitiva de configuração, seus custos de assinatura mensal (frequentemente superiores a R\$ 99,00/mês) mostram-se financeiramente proibitivos para o trabalhador autônomo individual.
+    \item \textbf{Ferramentas baseadas em Modelos ``Isca'' (\textit{Freemium} Restritivo):} Soluções como Reservio \cite{reservio_br, reservio_pt} e Minha Agenda Virtual utilizam planos gratuitos com tetos severos de utilização (como limite reduzido de agendamentos mensais), criando barreiras artificiais que inviabilizam a operação contínua do prestador e forçam a migração para faixas pagas onerosas.
+    \item \textbf{Aplicações Web ``Data-Heavy'' Desconectadas da Realidade Móvel Brasileira:} Softwares tradicionais de mercado (como Prit, Gendo e Fresha \cite{fresha_play}) pressupõem que tanto o prestador quanto o cliente dispõem de conexões de banda larga fixa ou móvel de alta estabilidade, transferindo megabytes de scripts e consultando bancos de dados relacionais diretamente a cada interação de calendário.
+\end{enumerate}
+
+Esse terceiro fator é particularmente crítico no território nacional. Dados consolidados da pesquisa TIC Domicílios conduzida pelo CETIC.br \cite{cetic_tic_domicilios_2024} evidenciam que 57\% da população brasileira vive sob condições precárias de conectividade à internet, sendo que apenas 3\% dos indivíduos pertencentes às classes D e E --- estrato no qual se concentra parcela significativa dos microempreendedores e de sua clientela --- possuem acesso considerado satisfatório. Adicionalmente, o custo elevado das franquias de dados móveis impõe um racionamento constante do consumo de megabytes.
+
+Diante de redes móveis instáveis (3G/4G com alta perda de pacotes e zonas de sombra), uma abordagem frequentemente sugerida na literatura é a adoção de arquiteturas \textit{Offline-First}, baseadas na replicação local do banco de dados no navegador do usuário e sincronização posterior. Entretanto, no domínio específico de sistemas de agendamento --- nos quais múltiplos clientes anônimos disputam concorrentemente os mesmos intervalos de tempo finitos de um prestador ---, o paradigma \textit{Offline-First} introduz uma complexidade desproporcional de reconciliação de estados distribuídos (\textit{sync hell}), podendo induzir confirmações locais falsas que resultam em conflitos posteriores. Ademais, o tráfego de sincronização de bancos locais consome substancialmente mais franquia de dados móveis do que requisições pontuais otimizadas.
+
+A inovação técnica deste trabalho reside em substituir a complexidade da sincronização offline pela eficiência cirúrgica de uma arquitetura \textbf{\textit{Cache-First} na borda}. Ao manter a disponibilidade pré-calculada em memória no Upstash Redis e servi-la por meio de Supabase Edge Functions, cada consulta de agenda transfere um payload JSON enxuto de aproximadamente 2 a 5 kilobytes (KB) com tempo de resposta inferior a 100 milissegundos. Aliada a uma estrutura de custos puramente \textit{serverless} que resulta em uma despesa operacional marginal estimada em R\$ 0,068 por prestador ao mês em larga escala, a arquitetura proposta democratiza o acesso a uma ferramenta profissional, segura e resiliente.
+
+%====================================================================
+% 2 DESENVOLVIMENTO
+%====================================================================
+
+\section{DESENVOLVIMENTO}
+\label{sec:desenvolvimento}
+\justifying
+
+\subsection{Especificação das Funcionalidades da Ferramenta}
+\label{subsec:especificacao_funcionalidades}
+
+A especificação de requisitos e o projeto arquitetural constituem etapas fundamentais no ciclo de vida da Engenharia de Software, estabelecendo os alicerces para a manutenibilidade, segurança e validação do sistema \cite{pressman2021}. Para solucionar o problema da gestão de agendas em conexões móveis limitadas sem incorrer nos custos de sincronização de estado local, a plataforma \textbf{Lume Agenda} foi projetada sob uma abordagem modular baseada em Arquitetura Limpa (\textit{Clean Architecture}) e computação \textit{serverless} distribuída na borda.
+
+A organização estrutural da solução é segmentada em três subsistemas principais, cujas fronteiras e responsabilidades técnicas são estritamente delimitadas:
+
+\begin{itemize}
+    \item \textbf{Subsistema de Apresentação e Experiência PWA (Camada de Interface -- Next.js/Vercel):} Responsável pela renderização híbrida da interface pública de agendamento e do painel administrativo do prestador. Fornece uma experiência instalável (\textit{Mobile-First}), validação preliminar de entradas, controle de sessão do prestador e tratamento determinístico de estados de interface (\texttt{idle}, \texttt{pending}, \texttt{success}, \texttt{empty} e \texttt{error}), sem jamais acessar o banco de dados, o cache ou o serviço de e-mails diretamente do navegador.
+    \item \textbf{Subsistema de Orquestração Serverless e Cache na Borda (Camada de Aplicação/API -- Supabase Edge Functions e Upstash Redis):} Atua como o mediador central e exclusivo de todas as regras de negócio. Recebe comandos via HTTP, valida contratos e tokens JWT, executa o padrão de leitura \textit{Cache-Aside} sobre o Upstash Redis para consultas de disponibilidade em milissegundos e aplica a invalidação seletiva (\textit{Write-Invalidate}) imediatamente após mutações de estado.
+    \item \textbf{Subsistema de Persistência Transacional, Segurança e Mensageria (Camada de Dados -- PostgreSQL, RLS e Resend):} Mantém a fonte autoritativa da verdade no PostgreSQL, garantindo isolamento multi-tenant via \textit{Row Level Security} (RLS), prevenção matemática contra agendamentos sobrepostos (\texttt{btree\_gist}), execução de transações ACID idempotentes via funções remotas (RPC) e despacho assíncrono resiliente de e-mails transacionais por meio do padrão \textit{Transactional Outbox} integrado ao Resend.
+\end{itemize}
+
+A Figura \ref{arquitetura} ilustra a arquitetura estática global do ecossistema, evidenciando o desacoplamento entre os clientes PWA, a camada de hospedagem na Vercel, as Edge Functions, o firewall de RLS no PostgreSQL e os serviços gerenciados de cache e mensageria.
 
 \begin{figure}[hbt]
 \centering
-\includegraphics[width=.9\textwidth]{diagrama-arquitetural.png}
-\caption{Diagrama Arquitetural e Fluxo de Dados}
+\includegraphics[width=.92\textwidth]{diagrama-arquitetural.png}
+\caption{Arquitetura de componentes e fluxo de dados da solução Cache-First}
 \label{arquitetura}
+\vspace{0.1cm}
+{\footnotesize Fonte: Autoria própria (2026).}
 \end{figure}
 
-Os componentes fundamentais da solução são:
+As funcionalidades detalhadas da ferramenta e os fluxos comportamentais são descritos a seguir, categorizados por seus respectivos módulos de atuação.
+
+\subsubsection{Subsistema de Apresentação e Experiência PWA (Camada de Interface)}
 
 \begin{itemize}
-    \item \textbf{Frontend:} Aplicação \textit{Progressive Web App} \cite{pwa_optimal_strategies} (PWA) em Next.js, hospedada na Vercel\footnote{https://vercel.com/} e entregue via rede de entrega de conteúdo (do inglês, \textit{Edge Network}).
-    \item \textbf{Backend:} O ecossistema Supabase\footnote{https://supabase.com} provê:
-        \begin{itemize}
-            \item \textbf{Banco de Dados:} PostgreSQL \cite{postgres_isolation} como fonte da verdade (do inglês, \textit{Source of Truth}).
-            \item \textbf{Segurança:} Autenticação integrada com segurança em nível de linha (do inglês, \textit{Row Level Security - RLS} \cite{medium_rls_explained}), garantindo isolamento de dados.
-            \item \textbf{Orquestração:} Funções \textit{serverless} (Edge Functions) para regras de negócio.
-        \end{itemize}
-    \item \textbf{Cache:} Redis \cite{redis_invalidation} gerenciado (Upstash\footnote{https://upstash.com/}) para dados voláteis de baixa latência.
-    \item \textbf{Mensageria:} Resend\footnote{https://resend.com/} para despacho assíncrono de notificações transacionais (Serviço de email para o envio de confirmações e cancelamentos.).
+    \item \textbf{Jornada Pública Sem Login (\textit{Zero-Friction Booking}):} Expõe a agenda pública do prestador através da rota dinâmica \texttt{/<public\_slug>}, permitindo que o cliente anônimo consulte datas com vagas livres em uma janela de até 42 dias, escolha um horário disponível e confirme o agendamento em no máximo três etapas informando apenas nome, e-mail e telefone.
+    \item \textbf{Painel Administrativo do Prestador:} Oferece interfaces protegidas por autenticação para configuração de perfil, criação e ativação de grupos de disponibilidade (\texttt{AvailabilityRuleGroup}), definição de intervalos por dia da semana (\texttt{AvailabilityRule}), registro de bloqueios ou horários extras (\texttt{AvailabilityOverride}), visualização da agenda diária consolidada (com estados \texttt{available}, \texttt{booked} e \texttt{blocked}) e listagem de clientes atendidos.
+    \item \textbf{Estratégia Segura de Service Worker e Manifest:} Implementa os artefatos de \textit{Progressive Web App} para permitir instalação na tela inicial do smartphone e cacheamento exclusivo do \textit{shell} estático da aplicação, proibindo expressamente o armazenamento local de dados pessoais (PII), tokens JWT ou tokens de cancelamento, bem como bloqueando falsas confirmações offline.
 \end{itemize}
 
-\subsection{Padrão de Leitura: Cache-Aside}
-Para mitigar a latência, implementa-se o padrão \textbf{\textit{Cache-Aside}} \cite{medium_caching_essentials}. A aplicação orquestra a busca conforme o algoritmo:
-
-\begin{enumerate}
-    \item \textbf{Requisição:} O cliente solicita a disponibilidade via API.
-    \item \textbf{Verificação (Look-Aside):} Consulta-se primeiramente o Redis.
-    \item \textbf{Cenário \textit{Cache Hit}:} Se o dado existe, retorna-se o JSON, poupando o banco de dados.
-    \item \textbf{Cenário \textit{Cache Miss}:} Se ausente, a função consulta o PostgreSQL (realizando os JOINs necessários), serializa o resultado, grava no Redis com tempo de vida (TTL) definido e retorna ao cliente.
-\end{enumerate}
-
-Esta abordagem garante consistência eventual (do inglês, \textit{eventually consistent}) com alta performance, penalizando apenas a primeira requisição do período.
-
-\subsection{Padrão de Escrita: Transacional com Invalidação}
-A integridade dos dados exige o padrão \textbf{\textit{Write-Invalidate}} dentro de um contexto transacional ACID (atomicidade, consistência, isolamento e durabilidade):
-
-\begin{enumerate}
-    \item \textbf{Transação:} A Edge Function inicia uma transação no PostgreSQL.
-    \item \textbf{Validação:} Verifica-se a disponibilidade em tempo real (bloqueio de leitura) e insere-se o agendamento.
-    \item \textbf{Commit/Rollback:} Em caso de conflito, executa-se o \textit{Rollback} (erro 409). Em sucesso, o \textit{Commit}.
-    \item \textbf{Invalidação (Pós-Commit):} Após a persistência, envia-se comando de deleção (\texttt{DEL}) ao Redis para a chave afetada, forçando a atualização do cache na próxima leitura.
-    \item \textbf{Notificação:} Dispara-se o email de confirmação assincronamente.
-\end{enumerate}
-
-%====================================================================
-
-\section{Requisitos do Sistema}
-\justifying
-A arquitetura proposta foi definida para satisfazer um conjunto de requisitos funcionais e não-funcionais que garantem a viabilidade e o sucesso do produto.
-
-\subsection{Requisitos Funcionais (RF)}
-Os requisitos funcionais definem as operações que os atores (Prestador e Cliente) podem realizar.
-
-\subsubsection{Prestador de Serviço}
-\begin{itemize}
-    \item \textbf{RF-P01 (Autenticação):} O sistema deve permitir que o Prestador se autentique via Supabase Auth.
-    \item \textbf{RF-P02 (Gestão de Perfil):} O Prestador deve poder gerenciar seu perfil e seu \texttt{public\_slug} (URL pública).
-    \item \textbf{RF-P03 (Gestão de Grupos de Disponibilidade):} O Prestador deve poder criar, nomear e ativar/desativar grupos de horários (ex: "Horário Comercial").
-    \item \textbf{RF-P04 (Gestão de Regras):} O Prestador deve poder definir intervalos de tempo (início/fim) para dias da semana dentro de um grupo.
-    \item \textbf{RF-P05 (Gestão de Exceções):} O Prestador deve poder bloquear horários específicos em um dia (ex: "médico às 15h").
-    \item \textbf{RF-P06 (Cancelamento de Agendamento):} O Prestador deve poder cancelar um agendamento existente, o que deve disparar uma notificação (via Resend) ao cliente.
-\end{itemize}
-
-\subsubsection{Cliente Final}
-\begin{itemize}
-    \item \textbf{RF-C01 (Consulta de Disponibilidade):} O Cliente anônimo deve poder visualizar os horários disponíveis na URL pública do prestador.
-    \item \textbf{RF-C02 (Realização de Agendamento):} O Cliente deve poder agendar um horário sem necessidade de login, fornecendo apenas nome, email e telefone.
-    \item \textbf{RF-C03 (Confirmação por Email):} Ao agendar, o Cliente deve receber um email de confirmação contendo um link único de cancelamento (\texttt{cancellation\_token}).
-    \item \textbf{RF-C04 (Cancelamento Próprio):} O Cliente deve poder cancelar seu agendamento através do link único, sem intervenção humana.
-\end{itemize}
-
-\subsection{Requisitos Não-Funcionais (RNF)}
-Os RNF definem os atributos de qualidade da arquitetura.
+\subsubsection{Subsistema de Orquestração Serverless e Cache na Borda (Camada de Aplicação/API)}
 
 \begin{itemize}
-    \item \textbf{RNF-D01 (Desempenho - Cache-First):} 95\% das requisições de disponibilidade (RF-C01) devem ser respondidas em menos de 100ms (servidas pelo cache).
-    \item \textbf{RNF-S01 (Segurança - RLS):} A arquitetura deve implementar Row Level Security. Um prestador autenticado só pode ler/escrever dados que possuam seu \texttt{provider\_id}.
-    \item \textbf{RNF-S02 (Segurança - Token):} O cancelamento do cliente (RF-C04) não deve ser possível sem o \texttt{cancellation\_token} único.
-    \item \textbf{RNF-C01 (Confiabilidade - ACID):} O agendamento (RF-C02) deve ser uma Transação ACID para garantir integridade e evitar \textit{race conditions}.
-    \item \textbf{RNF-U01 (Usabilidade - PWA):} A aplicação deve ser um PWA instalável e com design \textit{Mobile-First}.
-    \item \textbf{RNF-U02 (Usabilidade - Fluxo do Cliente):} O fluxo de agendamento do cliente (RF-C01 a C03) deve ser completado em no máximo 3 etapas, sem nenhuma exigência de login ou criação de senha.
+    \item \textbf{Leitura Otimizada via Padrão \textit{Cache-Aside}:} Nas funções públicas \texttt{get-availability} e \texttt{get-booking-calendar}, a camada serverless consulta primeiramente o Upstash Redis utilizando chaves compostas no formato \texttt{availability:<provider\_id>:<date>}. Em caso de acerto (\textit{Cache Hit}), o JSON pré-computado é retornado imediatamente com latência inferior a 100 ms e custo zero de banco de dados. Em caso de falha (\textit{Cache Miss}), a função consulta o PostgreSQL, calcula os intervalos livres, grava o resultado no Redis com tempo de vida (TTL) de 600 segundos e responde ao cliente.
+    \item \textbf{Escrita Transacional com Padrão \textit{Write-Invalidate}:} Qualquer operação de mutação --- seja um novo agendamento pelo cliente (\texttt{book-appointment}), um cancelamento (\texttt{cancel-appointment} ou \texttt{cancel-appointment-as-provider}) ou uma alteração nas regras e exceções do prestador --- dispara, logo após o \texttt{COMMIT} no PostgreSQL, o comando \texttt{DEL} sobre as chaves afetadas no Redis, garantindo que leituras subsequentes reflitam o estado atualizado.
+    \item \textbf{Padronização de Contratos e Observabilidade:} Todas as Edge Functions utilizam um envelope JSON uniforme (\texttt{ApiResult<T>}) que discrimina códigos semânticos de erro (\texttt{VALIDATION}, \texttt{UNAUTHENTICATED}, \texttt{UNAUTHORIZED}, \texttt{NOT_FOUND}, \texttt{CONFLICT}, \texttt{IDEMPOTENT}, \texttt{UNAVAILABLE} e \texttt{INTERNAL}) e propaga o cabeçalho \texttt{x-request-id} sem vazar detalhes internos ou credenciais.
 \end{itemize}
 
+\subsubsection{Subsistema de Persistência, Segurança Multi-Tenant e Mensageria (Camada de Dados)}
 
-%=============================================
+\begin{itemize}
+    \item \textbf{Isolamento Multi-Tenant com \textit{Row Level Security} (RLS):} Todas as tabelas de domínio no PostgreSQL operam com políticas RLS ativas vinculadas à função \texttt{auth.uid()}, assegurando no nível do motor de banco de dados que um prestador autenticado jamais possa ler, alterar ou excluir registros pertencentes a outro profissional.
+    \item \textbf{Controle de Concorrência ACID e Idempotência:} As operações críticas de escrita são encapsuladas em funções PL/pgSQL (\texttt{book\_appointment}, \texttt{cancel\_appointment\_by\_token} e \texttt{cancel\_appointment\_as\_provider}) que combinam bloqueios consultivos transacionais (\texttt{pg\_advisory\_xact\_lock}), tabela de deduplicação por chave de idempotência (\texttt{idempotency\_record}) e restrição espacial GiST de não-sobreposição de intervalos.
+    \item \textbf{Mensageria Resiliente via \textit{Transactional Outbox}:} Para evitar que oscilações externas na API de e-mail comprometam ou atrasem a confirmação de uma reserva, a transação de banco registra um evento pendente na tabela \texttt{email\_outbox}, o qual é processado assincronamente pela função \texttt{process-email-outbox} junto ao serviço Resend com controle de retentativas (\textit{exponential backoff}) e proteção contra envio duplicado.
+\end{itemize}
 
-\section{Protótipo e Implementação da Interface}
-\justifying
-
-A validação da arquitetura proposta materializa-se através de um protótipo desenvolvido com foco na usabilidade móvel (\textit{Mobile-First}) e na performance de carregamento. As interfaces foram projetadas para minimizar a fricção cognitiva, permitindo que tanto o prestador quanto o cliente realizem suas tarefas críticas com o mínimo de interações. Mais detalhes sobre a ferramenta estão disponíveis no repositório \footnote{https://github.com/ibaG20/repositorio-tcc}.
-
-\subsection{Visão do Prestador de Serviço}
-A área administrativa permite ao microempreendedor gerenciar sua disponibilidade de forma granular, abstraindo a complexidade das regras de negócio em uma interface intuitiva.
-
-As Figuras \ref{fig:config_regras_home} e \ref{fig:config_regras_detalhes} apresenta a tela de configuração de Grupos de Horários, onde o prestador define seus intervalos de trabalho padrão, conforme os requisitos RF-P03 e RF-P04.
-
-\subsection{Jornada do Cliente Final}
-A interface pública foca na conversão e na velocidade. Ao acessar o link único do prestador, o cliente visualiza a disponibilidade real (servida via cache Redis) e conclui o agendamento em três etapas, sem necessidade de login.
-
-A Figura \ref{fig:agendamento} ilustra a tela de seleção de horários e o modal de confirmação simplificado.
+Para formalizar as interações entre os atores e o sistema, a Figura \ref{fig:casos_uso} apresenta a estrutura do Diagrama de Casos de Uso (UML) modelado para o projeto, contemplando os atores primários (\texttt{Prestador de Serviço} e \texttt{Cliente Final}) e os atores secundários (\texttt{Sistema de Autenticação -- Supabase Auth} e \texttt{Sistema de Email -- Resend}).
 
 \begin{figure}[hbt]
-    \centering
-    % --- PRIMEIRA IMAGEM (ESQUERDA) ---
-    \begin{minipage}{0.22\textwidth}
-        \centering
-        \includegraphics[width=1\linewidth]{Horários - Home.png} 
-        \caption{Grupo de horários}
-        \label{fig:config_regras_home}
-    \end{minipage}
-    % --- SEGUNDA IMAGEM (MEIO) ---
-    \begin{minipage}{0.22\textwidth}
-        \centering
-        \includegraphics[width=1\linewidth]{Horários - Detalhes.png}
-        \caption{Criação de um novo horário }
-        \label{fig:config_regras_detalhes}
-    \end{minipage}
-    % --- TERCEIRA IMAGEM (DIREITO) ---
-    \begin{minipage}{0.22\textwidth}
-        \centering
-        \includegraphics[width=1\linewidth]{Agendamento cliente - Etapa 1.png}
-        \caption{Agendar horário}
-        \label{fig:agendamento}
-    \end{minipage}
-    
+\centering
+\fbox{\begin{minipage}{0.94\textwidth}
+\footnotesize
+\textbf{Atores Primários:} \texttt{Prestador de Serviço} $\mid$ \texttt{Cliente Final} \\
+\textbf{Atores Secundários:} \texttt{Sistema de Autenticação (Supabase Auth)} $\mid$ \texttt{Sistema de Email (Resend)}
+\vspace{0.2cm}
+\hrule
+\vspace{0.2cm}
+\begin{tabularx}{\linewidth}{@{}p{0.47\linewidth}|X@{}}
+\textbf{Casos de Uso -- Prestador de Serviço} & \textbf{Casos de Uso -- Cliente Final} \\ \hline
+$\bullet$ \textbf{UC-P01: Autenticar-se} \newline \hspace*{0.3cm} $\ll\text{include}\gg$ \textit{Validar Credenciais/JWT (Supabase Auth)} & $\bullet$ \textbf{UC-C01: Consultar Disponibilidade Pública} \newline \hspace*{0.3cm} (Acesso anônimo via \texttt{public\_slug}; leitura \textit{Cache-First}) \\
+$\bullet$ \textbf{UC-P02: Gerenciar Perfil Profissional} \newline \hspace*{0.3cm} (Nome, telefone, fuso horário e \texttt{public\_slug}) & $\bullet$ \textbf{UC-C02: Realizar Agendamento} \newline \hspace*{0.3cm} $\ll\text{include}\gg$ \textit{Vincular/Criar Cliente Isolado} \\
+$\bullet$ \textbf{UC-P03: Gerenciar Grupos de Disponibilidade} \newline \hspace*{0.3cm} (Criar, renomear, excluir e ativar/desativar grupos) & \hspace*{0.3cm} $\ll\text{include}\gg$ \textit{Enviar Confirmação e Token (Resend)} \\
+$\bullet$ \textbf{UC-P04: Gerenciar Regras Semanais} \newline \hspace*{0.3cm} (Definir faixas \texttt{start\_time}/\texttt{end\_time} por dia) & $\bullet$ \textbf{UC-C03: Visualizar Prévia de Cancelamento} \newline \hspace*{0.3cm} (Consulta segura sem efeito colateral via \texttt{GET}) \\
+$\bullet$ \textbf{UC-P05: Gerenciar Exceções (Overrides)} \newline \hspace*{0.3cm} (Cadastrar bloqueios ou horários extras) & $\bullet$ \textbf{UC-C04: Cancelar Agendamento Próprio} \newline \hspace*{0.3cm} (Execução via \texttt{POST} com \texttt{cancellation\_token}) \\
+$\bullet$ \textbf{UC-P06: Visualizar Agenda Diária Consolidada} & \\
+$\bullet$ \textbf{UC-P07: Cancelar Agendamento de Cliente} \newline \hspace*{0.3cm} $\ll\text{include}\gg$ \textit{Notificar Cancelamento (Resend)} & \\
+$\bullet$ \textbf{UC-P08: Visualizar Lista de Clientes} & \\
+\end{tabularx}
+\end{minipage}}
+\caption{Diagrama de Casos de Uso (UML) do ecossistema de agendamento}
+\label{fig:casos_uso}
+\vspace{0.1cm}
+{\footnotesize Fonte: Autoria própria (2026).}
 \end{figure}
 
-%====================================================================
+Complementando a visão estrutural, as Figuras \ref{fig:seq_leitura}, \ref{fig:seq_escrita} e \ref{fig:seq_cancelamento} detalham os diagramas de sequência dos três fluxos críticos que sustentam a proposta arquitetural: (1) a consulta pública de disponibilidade via \textit{Cache-Aside}, (2) a realização de agendamento transacional ACID com invalidação de cache e enfileiramento de e-mail, e (3) o cancelamento autônomo pelo cliente via token único.
 
-%\clearpage 
-\section{Cronograma}
+\begin{figure}[hbt]
+\centering
+\begin{lstlisting}
+Cliente (PWA)          Edge Function (Supabase)       Cache (Upstash Redis)      Banco (PostgreSQL)
+     |                            |                             |                         |
+     |--- GET /get-availability ->|                             |                         |
+     |    (?slug=...&date=...)    |--- GET availability:id:dt ->|                         |
+     |                            |                             |                         |
+     |                            | [ALT 1: CACHE HIT (~15-50ms)]                         |
+     |                            |<-- JSON de slots livres ----|                         |
+     |<-- 200 OK (slots JSON) ----|                             |                         |
+     |                            |                             |                         |
+     |                            | [ALT 2: CACHE MISS (~350-500ms)]                      |
+     |                            |<-- nil (chave ausente) -----|                         |
+     |                            |--- SELECT Regras, Excecoes e Appointments ----------->|
+     |                            |<-- Tuplas de disponibilidade e ocupacao --------------|
+     |                            |--- Calcula slots livres ----|                         |
+     |                            |--- SET availability:id:dt (TTL 600s) ---------------->|
+     |<-- 200 OK (slots JSON) ----|                             |                         |
+\end{lstlisting}
+\caption{Diagrama de sequência do fluxo de consulta de disponibilidade (Cache-Aside)}
+\label{fig:seq_leitura}
+\vspace{0.1cm}
+{\footnotesize Fonte: Autoria própria (2026).}
+\end{figure}
 
-A Tabela \ref{tab:cronograma_detalhado} apresenta o desdobramento operacional das atividades previstas para o semestre letivo, detalhando os entregáveis de cada etapa.
+\begin{figure}[hbt]
+\centering
+\begin{lstlisting}
+Cliente (PWA)          Edge Function (Supabase)       Banco (PostgreSQL RPC)     Cache (Redis) / Outbox
+     |                            |                             |                         |
+     |-- POST /book-appointment ->|                             |                         |
+     |   (+ Idempotency-Key)      |-- RPC book_appointment() -->|                         |
+     |                            |   [BEGIN TRANSACTION]       |                         |
+     |                            |   1. pg_advisory_xact_lock  |                         |
+     |                            |   2. Checa idempotency_key  |                         |
+     |                            |   3. Valida regras/override |                         |
+     |                            |   4. Upsert Client/Provider |                         |
+     |                            |   5. INSERT Appointment     |                         |
+     |                            |      (GiST no_overlap check)|                         |
+     |                            |   6. INSERT email_outbox    |                         |
+     |                            |   [COMMIT / ROLLBACK]       |                         |
+     |                            |                             |                         |
+     |                            | [ALT 1: Transacao Confirmada]                         |
+     |                            |<-- kind: 'created' ---------|                         |
+     |                            |-- DEL availability:id:dt ---------------------------->|
+     |<-- 201 Created ------------|                             |-- Async Resend Email -->|
+     |                            |                             |                         |
+     |                            | [ALT 2: Conflito de Horario (Exclusion Violation)]    |
+     |                            |<-- kind: 'conflict' --------|                         |
+     |<-- 409 Conflict -----------|                             |                         |
+\end{lstlisting}
+\caption{Diagrama de sequência do fluxo de realização de agendamento transacional (ACID)}
+\label{fig:seq_escrita}
+\vspace{0.1cm}
+{\footnotesize Fonte: Autoria própria (2026).}
+\end{figure}
+
+\begin{figure}[hbt]
+\centering
+\begin{lstlisting}
+Cliente (Link Email)   Edge Function (Supabase)       Banco (PostgreSQL RPC)     Cache (Upstash Redis)
+     |                            |                             |                         |
+     |-- GET /get-cancellation -->|                             |                         |
+     |   (?token=UUID)            |-- SELECT resumo (sem mutar)>|                         |
+     |<-- 200 OK (Previa Visual) -|<-- Dados da reserva --------|                         |
+     |                            |                             |                         |
+     |-- POST /cancel-appointment>|                             |                         |
+     |   (token + Idempotency-Key)|-- RPC cancel_by_token() --->|                         |
+     |                            |   SELECT ... FOR UPDATE     |                         |
+     |                            |   UPDATE status='CANCELLED' |                         |
+     |                            |<-- kind: 'cancelled' -------|                         |
+     |                            |-- DEL availability:id:dt ---------------------------->|
+     |<-- 200 OK (Cancelado) -----|                             |                         |
+\end{lstlisting}
+\caption{Diagrama de sequência do fluxo de cancelamento autônomo por token}
+\label{fig:seq_cancelamento}
+\vspace{0.1cm}
+{\footnotesize Fonte: Autoria própria (2026).}
+\end{figure}
+
+Para sintetizar o escopo funcional completo e os atributos de qualidade exigidos do sistema, o Quadro \ref{quadro:requisitos_funcionais} apresenta a matriz de Requisitos Funcionais (RF) para os atores Prestador de Serviço e Cliente Final, enquanto o Quadro \ref{quadro:requisitos_nao_funcionais} consolida a matriz de Requisitos Não-Funcionais (RNF).
 
 \begin{table}[hbt]
 \centering
-\caption{Cronograma Detalhado de Desenvolvimento e Escrita}
+\caption{Matriz de requisitos funcionais do sistema de agendamento}
+\label{quadro:requisitos_funcionais}
+\footnotesize
+\renewcommand{\arraystretch}{1.2}
+\begin{tabularx}{\textwidth}{|l|l|p{3.4cm}|X|l|}
+\hline
+\textbf{ID} & \textbf{Ator} & \textbf{Funcionalidade} & \textbf{Descrição Técnica} & \textbf{Prioridade} \\ \hline
+\textbf{RF-P01} & Prestador & Autenticar-se & Permitir autenticação do prestador via e-mail/senha ou provedor OAuth (Supabase Auth com PKCE). & Obrigatório \\ \hline
+\textbf{RF-P02} & Prestador & Gerenciar Perfil & Permitir criação e atualização do perfil público (\texttt{name}, \texttt{phone}, \texttt{timezone} e \texttt{public\_slug} único). & Obrigatório \\ \hline
+\textbf{RF-P03} & Prestador & Gerenciar Grupos de Disponibilidade & Realizar operações CRUD em \texttt{AvailabilityRuleGroup} (ex: ``Horário Comercial''). & Obrigatório \\ \hline
+\textbf{RF-P04} & Prestador & Ativar/Desativar Grupos & Alternar estado \texttt{is\_active} de grupos, impedindo ativação simultânea com dias da semana conflitantes. & Obrigatório \\ \hline
+\textbf{RF-P05} & Prestador & Gerenciar Regras Semanais & Definir intervalos (\texttt{start\_time}, \texttt{end\_time}) para dias da semana (\texttt{1..7}) dentro de um grupo. & Obrigatório \\ \hline
+\textbf{RF-P06} & Prestador & Gerenciar Exceções (\textit{Overrides}) & Bloquear (\texttt{is\_available = false}) ou abrir (\texttt{is\_available = true}) intervalos em datas específicas. & Obrigatório \\ \hline
+\textbf{RF-P07} & Prestador & Visualizar Agenda Diária & Exibir visão diária consolidada classificando horários em Disponível, Ocupado ou Bloqueado. & Obrigatório \\ \hline
+\textbf{RF-P08} & Prestador & Cancelar Agendamento & Permitir ao prestador alterar o \texttt{status} de um \texttt{Appointment} próprio para \texttt{CANCELLED}. & Obrigatório \\ \hline
+\textbf{RF-P09} & Prestador & Notificar Cancelamento & Disparar obrigatoriamente e-mail via Resend ao cliente quando o prestador executar o RF-P08. & Obrigatório \\ \hline
+\textbf{RF-P10} & Prestador & Visualizar Clientes & Listar clientes (\texttt{ProviderClient}) que possuem agendamentos vinculados ao prestador autenticado. & Obrigatório \\ \hline
+\textbf{RF-C01} & Cliente & Consultar Disponibilidade & Permitir acesso anônimo à agenda pública via \texttt{public\_slug} para visualizar datas e horários livres. & Obrigatório \\ \hline
+\textbf{RF-C02} & Cliente & Realizar Agendamento & Permitir reserva de horário disponível sem login, informando apenas \texttt{name}, \texttt{email} e \texttt{phone}. & Obrigatório \\ \hline
+\textbf{RF-C03} & Cliente & Criar/Vincular Cliente & Verificar existência prévia do e-mail normalizado na transação e vincular ao cadastro isolado do prestador. & Obrigatório \\ \hline
+\textbf{RF-C04} & Cliente & Notificar Confirmação & Enviar e-mail automático via Resend com resumo da reserva e link contendo o \texttt{cancellation\_token}. & Obrigatório \\ \hline
+\textbf{RF-C05} & Cliente & Cancelar Próprio Agendamento & Permitir cancelamento autônomo pelo cliente através do link único com \texttt{cancellation\_token}. & Obrigatório \\ \hline
+\end{tabularx}
+\vspace{0.1cm}
+{\footnotesize Fonte: Autoria própria (2026).}
+\end{table}
+
+\begin{table}[hbt]
+\centering
+\caption{Matriz de requisitos não-funcionais e metas de qualidade}
+\label{quadro:requisitos_nao_funcionais}
+\footnotesize
+\renewcommand{\arraystretch}{1.2}
+\begin{tabularx}{\textwidth}{|l|l|p{3.3cm}|X|}
+\hline
+\textbf{ID} & \textbf{Categoria} & \textbf{Atributo} & \textbf{Especificação e Meta Mensurável} \\ \hline
+\textbf{RNF-D01} & Desempenho & Leitura \textit{Cache-First} & A consulta de disponibilidade (RF-C01) deve ser servida via Upstash Redis, com 95\% das respostas (p95) em tempo inferior a 100 ms. \\ \hline
+\textbf{RNF-D02} & Desempenho & Carregamento PWA & A aplicação web progressiva deve atingir pontuação de Performance superior a 90 na auditoria Google Lighthouse. \\ \hline
+\textbf{RNF-D03} & Desempenho & Interatividade (TBT) & O \textit{Total Blocking Time} (TBT) da página pública de agendamento não deve exceder 200 ms em dispositivos móveis. \\ \hline
+\textbf{RNF-D04} & Desempenho & Invalidação Imediata & Qualquer operação de escrita (RF-P05, RF-P06, RF-P08, RF-C02, RF-C05) deve invalidar imediatamente as chaves de cache afetadas. \\ \hline
+\textbf{RNF-S01} & Segurança & RLS Obrigatório & Implementar \textit{Row Level Security} em todas as tabelas do PostgreSQL; um prestador só lê/escreve registros com seu \texttt{provider\_id}. \\ \hline
+\textbf{RNF-S02} & Segurança & Proteção de API & Todas as funções privadas do prestador devem validar assinatura e expiração de token JWT emitido pelo Supabase Auth. \\ \hline
+\textbf{RNF-S03} & Segurança & Entropia do Token & O cancelamento pelo cliente (RF-C05) exige obrigatoriamente um \texttt{cancellation\_token} (UUID v4) único e imprevisível. \\ \hline
+\textbf{RNF-S04} & Segurança & Não-Exposição de PII & O \texttt{cancellation\_token} nunca deve ser exposto em respostas públicas de listagem, logs ou URLs de rastreamento. \\ \hline
+\textbf{RNF-C01} & Confiabilidade & Transação ACID & A confirmação de reserva (RF-C02) deve executar atomicamente em banco via RPC com constraint GiST contra \textit{race conditions}. \\ \hline
+\textbf{RNF-C02} & Confiabilidade & Integridade Relacional & Uso estrito de tipos \texttt{ENUM}, \texttt{CHECK constraints} de intervalos temporais (\texttt{start < end}) e chaves estrangeiras em todas as tabelas. \\ \hline
+\textbf{RNF-C03} & Confiabilidade & Entrega Resiliente & O envio de e-mails (RF-C04, RF-P09) deve utilizar fila transacional (\texttt{email\_outbox}) com retentativas automáticas sem bloquear a API. \\ \hline
+\textbf{RNF-U01} & Usabilidade & Instalabilidade PWA & A aplicação deve prover \textit{Web App Manifest}, ícones e \textit{Service Worker} válidos para instalação em dispositivos móveis. \\ \hline
+\textbf{RNF-U02} & Usabilidade & Design \textit{Mobile-First} & Todas as telas públicas e administrativas devem ser projetadas prioritariamente para telas verticais sensíveis ao toque. \\ \hline
+\textbf{RNF-U03} & Usabilidade & Fluxo Sem Fricção & A jornada de agendamento do cliente deve ser concluída em até 3 etapas, sem exigir criação de conta ou senha. \\ \hline
+\textbf{RNF-M01} & Manutenibilidade & Arquitetura Limpa & Código em TypeScript estrito estruturado com separação explícita entre camadas de domínio, aplicação, dados e apresentação. \\ \hline
+\textbf{RNF-M02} & Manutenibilidade & Stack Padronizada & Adoção padronizada de Vercel (Next.js), Supabase (Postgres, Auth, Edge Functions), Upstash (Redis) e Resend. \\ \hline
+\end{tabularx}
+\vspace{0.1cm}
+{\footnotesize Fonte: Autoria própria (2026).}
+\end{table}
+
+%====================================================================
+
+\subsection{Fundamentação Teórica}
+\label{subsec:fundamentacao_teorica}
+
+O desenvolvimento de aplicações web voltadas a cenários de alta leitura, baixa largura de banda e necessidade estrita de consistência transacional apoia-se em conceitos consolidados de Sistemas Distribuídos, Bancos de Dados e Engenharia de Software Web.
+
+\subsubsection{Progressive Web Apps (PWA) e Estratégias de Conectividade}
+\label{subsubsec:pwa_conectividade}
+
+As Aplicações Web Progressivas (\textit{Progressive Web Apps} -- PWAs) combinam o alcance universal da web (acesso imediato por hiperlink sem intermediação de lojas proprietárias como Google Play ou App Store) com capacidades historicamente restritas a aplicativos nativos, tais como instalação na tela inicial e carregamento assistido por \textit{Service Workers} \cite{pwa_optimal_strategies}. Para o microempreendedor, a distribuição da agenda por um simples link (\texttt{public\_slug}) compartilhado na biografia do Instagram ou em resposta automática do WhatsApp elimina a barreira de conversão imposta pelo download de dezenas de megabytes de um aplicativo nativo pelo cliente final.
+
+Na engenharia de PWAs sob redes móveis instáveis, destacam-se duas filosofias arquiteturais distintas \cite{kleppmann2017}:
+\begin{itemize}
+    \item \textbf{Arquitetura \textit{Offline-First}:} Preconiza que toda leitura e escrita ocorra primariamente em um banco de dados local embutido no navegador (como IndexedDB ou SQLite WebAssembly), sincronizando mutações em segundo plano quando a conectividade é restabelecida. Embora eficaz para aplicativos de uso individual (como blocos de notas), essa abordagem apresenta falhas estruturais graves em sistemas de reserva de recursos finitos compartilhados: dois clientes desconectados visualizariam o mesmo horário como livre e registrariam reservas locais conflitantes, exigindo cancelamentos posteriores involuntários quando a sincronização ocorresse.
+    \item \textbf{Arquitetura \textit{Cache-First} na Borda (\textit{Edge Cache-First}):} Mantém o estado autoritativo centralizado para escritas transacionais, mas desloca o atendimento das leituras massivas para nós de cache em memória geograficamente próximos ao usuário, combinados ao cacheamento local apenas da estrutura visual estática (\textit{App Shell}). Dessa forma, o tráfego de dados durante a navegação na agenda resume-se a poucos kilobytes de JSON puro, garantindo velocidade em redes 3G/4G sem comprometer a veracidade da disponibilidade.
+\end{itemize}
+
+\subsubsection{Padrões de Cache Distribuído: Cache-Aside e Write-Invalidate}
+\label{subsubsec:padroes_cache}
+
+Em sistemas de agendamento online, a proporção entre leituras (clientes consultando datas e horários livres) e escritas (confirmação efetiva de reservas) é fortemente assimétrica, frequentemente superando a razão de $50:1$. A sobrecarga direta sobre o banco de dados relacional em cada visualização de calendário eleva tanto a latência de resposta quanto o custo computacional de CPU e conexões.
+
+Para otimizar esse perfil de carga, emprega-se a combinação dos padrões \textbf{\textit{Cache-Aside}} (\textit{Lazy Loading}) na leitura e \textbf{\textit{Write-Invalidate}} na escrita \cite{redis_invalidation, medium_caching_essentials}. Matematicamente, o tempo médio efetivo de resposta para consultas de disponibilidade ($T_{\text{efetivo}}$) pode ser expresso pela Equação (\ref{eq:latencia_cache}):
+
+\begin{equation}
+T_{\text{efetivo}} = h \cdot T_{\text{hit}} + (1 - h) \cdot \left( T_{\text{hit}} + T_{\text{db}} + T_{\text{set}} \right)
+\label{eq:latencia_cache}
+\end{equation}
+
+\noindent onde $h \in [0, 1]$ representa a taxa de acerto do cache (\textit{Cache Hit Ratio}), $T_{\text{hit}}$ corresponde ao tempo de leitura na memória chave-valor do Redis, $T_{\text{db}}$ denota o tempo de execução das consultas relacionais e cálculo de slots no PostgreSQL, e $T_{\text{set}}$ representa o tempo de serialização e gravação da chave no cache. Quando $h \ge 0{,}95$ e $T_{\text{hit}} \approx 25\text{ ms}$, mesmo que o cálculo relacional completo ($T_{\text{db}}$) demande $400\text{ ms}$, a latência média percebida pelos usuários converge para aproximadamente $45\text{ ms}$, atendendo com folga ao requisito RNF-D01 ($< 100\text{ ms}$).
+
+Para evitar o problema clássico de leitura obsoleta (\textit{stale data}) após a marcação de um horário, o padrão \textit{Write-Invalidate} determina que toda transação de escrita bem-sucedida remova imediatamente a chave correspondente no Redis (\texttt{DEL}), em vez de tentar recalculá-la de maneira concorrente. Caso duas escritas ocorram em sequência rápida, a simples deleção garante que apenas a próxima leitura recompute o estado consolidado a partir do banco de dados, preservando a consistência eventual estrita \cite{kleppmann2017}.
+
+\subsubsection{Transações ACID, Concorrência Espacial, Idempotência e RLS}
+\label{subsubsec:acid_rls}
+
+A camada de persistência de um sistema de reservas deve impedir que duas requisições simultâneas reservem o mesmo intervalo de tempo para o mesmo prestador (\textit{double booking}) \cite{elmasri2018, postgres_isolation}. A simples verificação prévia na aplicação (\texttt{SELECT} seguido de \texttt{INSERT}) é vulnerável a condições de corrida (\textit{Time-of-Check to Time-of-Use} -- TOCTOU) sob o nível de isolamento padrão \textit{Read Committed}.
+
+No PostgreSQL, a solução formal e livre de condições de corrida combina três mecanismos complementares \cite{postgres_isolation}:
+\begin{enumerate}
+    \item \textbf{Restrições de Exclusão com Índices GiST (\textit{Exclusion Constraints}):} Utilizando o operador de interseção de intervalos temporais contínuos (\texttt{tstzrange(start\_datetime, end\_datetime, '[)') WITH \&\&}) aliado à igualdade de prestador (\texttt{provider\_id WITH =}), o próprio motor de armazenamento rejeita fisicamente qualquer tentativa de confirmar dois agendamentos sobrepostos, independentemente do escalonamento de processos concorrentes.
+    \item \textbf{Idempotência de Comandos e Bloqueios Consultivos:} Em redes móveis instáveis, é comum que a conexão do cliente sofra queda após o servidor processar a reserva, levando o navegador a reenviar a mesma requisição (\textit{retry}). O uso de uma chave única de idempotência (\texttt{Idempotency-Key}) protegida por bloqueio consultivo transacional (\texttt{pg\_advisory\_xact\_lock}) garante que a repetição do comando retorne exatamente o resultado original gravado em \texttt{idempotency\_record}, sem duplicar registros ou e-mails.
+    \item \textbf{Segurança em Nível de Linha (\textit{Row Level Security} -- RLS) e \textit{Transactional Outbox}:} O RLS atua como um firewall declarativo interno ao PostgreSQL, anexando predicados de filtragem (\texttt{provider\_id = auth.uid()}) a todas as instruções SQL executadas por sessões autenticadas \cite{medium_rls_explained}. Por sua vez, o padrão \textit{Transactional Outbox} \cite{kleppmann2017} resolve o problema de escrita dual (\textit{Dual-Write Problem}) entre o banco de dados e o provedor de e-mail externo (Resend): o evento de notificação é inserido na tabela \texttt{email\_outbox} dentro da mesma transação ACID do agendamento, assegurando que nenhum e-mail seja perdido caso o serviço externo apresente indisponibilidade momentânea.
+\end{enumerate}
+
+%====================================================================
+
+\subsection{Trabalhos e Soluções Correlatas}
+\label{subsec:trabalhos_correlatos}
+
+A análise de soluções correlatas no mercado de sistemas de agendamento e na literatura aplicada a microempreendedores permite posicionar a contribuição técnica e econômica do \textbf{Lume Agenda}. Foram examinadas três frentes representativas do estado atual das ferramentas utilizadas no Brasil:
+
+\begin{enumerate}
+    \item \textbf{Plataformas de Gestão Corporativa para PMEs (Booksy e Trinks):} Soluções consolidadas como Booksy \cite{booksy_br, booksy_pricing} e Trinks \cite{trinks_planos, trinks_home} oferecem ecossistemas abrangentes voltados a estabelecimentos com múltiplos colaboradores, recepção dedicada, controle de estoque e comissões. Entretanto, exigem que o cliente final baixe um aplicativo próprio ou crie uma conta com senha para agendar, gerando alta taxa de abandono. Além disso, o custo mensal elevado (a partir de R\$ 99,00/mês) inviabiliza sua adoção pelo MEI individual.
+    \item \textbf{Ferramentas \textit{Freemium} com Limitação Artificial (Reservio e Minha Agenda Virtual):} O Reservio \cite{reservio_br, reservio_pt} disponibiliza páginas públicas de agendamento, porém adota uma estrutura \textit{freemium} na qual o plano gratuito impõe limites estritos de agendamentos mensais e restringe notificações automatizadas. Para um profissional que realiza entre 80 e 150 atendimentos por mês, a cota gratuita esgota-se na primeira semana de operação.
+    \item \textbf{Aplicações Web Tradicionais de Alto Consumo de Dados (Prit, Gendo e Similares):} Sistemas web convencionais projetados sem arquitetura \textit{Cache-First} na borda realizam consultas diretas ao banco de dados a cada mudança de dia no calendário e transferem pacotes pesados de scripts para o cliente, apresentando degradação severa de usabilidade em conexões móveis 3G/4G com franquia restrita \cite{cetic_tic_domicilios_2024}.
+\end{enumerate}
+
+O Quadro \ref{quadro:trabalhos_relacionados} sintetiza a comparação estruturada entre as categorias de soluções analisadas e a arquitetura implementada neste trabalho.
+
+\begin{table}[hbt]
+\centering
+\caption{Matriz comparativa de soluções de mercado e trabalhos relacionados}
+\label{quadro:trabalhos_relacionados}
+\footnotesize
+\renewcommand{\arraystretch}{1.25}
+\begin{tabularx}{\textwidth}{|p{2.9cm}|X|X|X|X|}
+\hline
+\textbf{Critério de Comparação} & \textbf{Booksy / Trinks (Enterprise PME)} & \textbf{Reservio (Freemium Restrito)} & \textbf{Prit / Gendo (Web Tradicional)} & \textbf{Lume Agenda (Proposta Deste Trabalho)} \\ \hline
+\textbf{Público-Alvo Primário} & Salões, clínicas e barbearias com múltiplos profissionais & Pequenos negócios com baixíssimo volume mensal & Empresas de serviços com banda larga estável & \textbf{Microempreendedor Individual (MEI)} em qualquer faixa de conectividade \\ \hline
+\textbf{Custo Mensal / Viabilidade} & Alto (R\$ 99,00+ / mês) & Gratuito limitado (Isca para planos caros) & Médio a Alto (Assinatura mensal fixa) & \textbf{Custo marginal de R\$ 0,068 / prestador / mês} \\ \hline
+\textbf{Estratégia de Rede e Leitura} & Apps pesados / API direta ao banco & Renderização web tradicional sem cache na borda & Consultas diretas ao SGBD (\textit{Data-Heavy}) & \textbf{PWA \textit{Cache-First} na borda (Upstash Redis + Edge Functions)} \\ \hline
+\textbf{Fricção para o Cliente Final} & Exige cadastro de conta, login ou download de app & Formulário web multi-etapas & Exige login do cliente na maioria dos fluxos & \textbf{Zero login (3 etapas via \texttt{public\_slug} + token no e-mail)} \\ \hline
+\textbf{Controle de Concorrência e Segurança} & Proprietário fechado & Proprietário fechado & Transações convencionais de aplicação & \textbf{PostgreSQL RLS + Exclusão GiST + Idempotência + Outbox} \\ \hline
+\end{tabularx}
+\vspace{0.1cm}
+{\footnotesize Fonte: Autoria própria (2026).}
+\end{table}
+
+%====================================================================
+
+\subsection{Persistência de Dados}
+\label{subsec:persistencia_dados}
+
+A camada de persistência de dados foi projetada no SGBD PostgreSQL (hospedado na plataforma Supabase) para atuar como a única fonte autoritativa da verdade (\textit{Single Source of Truth}), garantindo integridade referencial, consistência temporal e isolamento multi-tenant \cite{elmasri2018}. Diferentemente de modelagens simplistas nas quais a aplicação web executa queries diretamente sobre tabelas abertas, o esquema implementado no repositório \texttt{lume-agenda} incorpora nove estruturas relacionais integradas: a tabela de autenticação nativa (\texttt{auth.users}), seis tabelas de domínio de agendamento (\texttt{profiles}, \texttt{AvailabilityRuleGroup}, \texttt{AvailabilityRule}, \texttt{Client}, \texttt{ProviderClient}, \texttt{AvailabilityOverride} e \texttt{Appointment}) e duas tabelas de infraestrutura transacional (\texttt{email\_outbox} e \texttt{idempotency\_record}).
+
+Uma decisão arquitetural relevante consolidada na implementação do TCC 2 foi a separação entre a entidade global \texttt{Client} (identificada pelo e-mail normalizado em letras minúsculas) e a entidade associativa \texttt{ProviderClient}. Essa modelagem impede que agendamentos anônimos realizados junto a um Prestador A exponham ou sobrescrevam silenciosamente dados de contato (nome e telefone) mantidos na carteira privada de clientes de um Prestador B, assegurando conformidade de privacidade e isolamento estrito por chave estrangeira composta \texttt{(provider\_id, client\_id)}.
+
+A Figura \ref{fig:der_banco} apresenta o Diagrama Entidade-Relacionamento (DER) completo da camada de persistência, e o Quadro \ref{quadro:dicionario_dados} detalha o dicionário de dados das tabelas implementadas.
+
+\begin{figure}[hbt]
+\centering
+\begin{lstlisting}
++-------------------+       1:1       +-----------------------------------+
+|    auth.users     |---------------->|           public.profiles         |
+|-------------------|                 |-----------------------------------|
+| PK id (uuid)      |                 | PK,FK id (uuid)                   |
+|    email (text)   |                 |       name (text)                 |
++-------------------+                 |       public_slug (text, UNIQUE)  |
+                                      |       phone (text)                |
+                                      |       timezone (text)             |
+                                      +-----------------+-----------------+
+                                                        |
+         +----------------------+-----------------------+-----------------------+
+         | 1:N                  | 1:N                   | 1:N                   | 1:N
+         v                      v                       v                       v
++------------------------+ +------------------------+ +-------------------+ +------------------------+
+| AvailabilityRuleGroup  | |  AvailabilityOverride  | |  ProviderClient   | |      Appointment       |
+|------------------------| |------------------------| |-------------------| |------------------------|
+| PK id (uuid)           | | PK id (uuid)           | | PK id (uuid)      | | PK id (uuid)           |
+| FK provider_id (uuid)  | | FK provider_id (uuid)  | | FK provider_id    | | FK provider_id (uuid)  |
+|    name (text)         | |    start_datetime      | | FK client_id      | | FK client_id (uuid)    |
+|    is_active (bool)    | |    end_datetime        | |    name, email    | |    start_datetime      |
++-----------+------------+ |    is_available (bool) | |    phone          | |    end_datetime        |
+            | 1:N          +------------------------+ +---------+---------+ |    status (ENUM)       |
+            v                                                   ^           |    cancellation_token  |
++------------------------+                            +---------+---------+ +-----------+------------+
+|    AvailabilityRule    |                            |      Client       |             | 1:N
+|------------------------|                            |-------------------|             v
+| PK id (uuid)           |                            | PK id (uuid)      | +------------------------+
+| FK group_id (uuid)     |                            |    email (UNIQUE) | |      email_outbox      |
+|    day_of_week (1..7)  |                            |    name, phone    | |------------------------|
+|    start_time (time)   |                            +-------------------+ | PK id (uuid)           |
+|    end_time (time)     |                                                  | FK appointment_id      |
++------------------------+   +--------------------------------------------+ |    event_type (ENUM)   |
+                             |             idempotency_record             | |    status (ENUM)       |
+                             |--------------------------------------------| |    attempt_count (int) |
+                             | PK (operation, idempotency_key)            | +------------------------+
+                             |    request_hash (char 64), response (jsonb)|
+                             +--------------------------------------------+
+\end{lstlisting}
+\caption{Diagrama Entidade-Relacionamento (DER) da camada de persistência}
+\label{fig:der_banco}
+\vspace{0.1cm}
+{\footnotesize Fonte: Autoria própria (2026).}
+\end{figure}
+
+\begin{table}[hbt]
+\centering
+\caption{Dicionário de dados das tabelas de persistência relacional no PostgreSQL}
+\label{quadro:dicionario_dados}
+\scriptsize
+\renewcommand{\arraystretch}{1.15}
+\begin{tabularx}{\textwidth}{|l|l|l|X|}
+\hline
+\textbf{Tabela} & \textbf{Atributo} & \textbf{Tipo de Dados} & \textbf{Restrições e Descrição Técnica} \\ \hline
+\multirow{5}{*}{\texttt{profiles}} 
+ & \texttt{id} & \texttt{UUID} & \texttt{PRIMARY KEY}, \texttt{FK -> auth.users(id) ON DELETE CASCADE}. \\
+ & \texttt{name} & \texttt{TEXT} & \texttt{NOT NULL}, entre 1 e 120 caracteres. Nome público do prestador. \\
+ & \texttt{public\_slug} & \texttt{TEXT} & \texttt{NOT NULL}, \texttt{UNIQUE}, regex \texttt{\^{}[a-z0-9]+(-[a-z0-9]+)*\$}. URL pública. \\
+ & \texttt{phone} & \texttt{TEXT} & \texttt{NULLABLE}, entre 7 e 30 caracteres. Telefone de contato. \\
+ & \texttt{updated\_at} & \texttt{TIMESTAMPTZ} & \texttt{NOT NULL DEFAULT now()}. Atualizado via trigger PL/pgSQL. \\ \hline
+\multirow{4}{*}{\texttt{AvailabilityRuleGroup}} 
+ & \texttt{id} & \texttt{UUID} & \texttt{PRIMARY KEY DEFAULT gen\_random\_uuid()}. \\
+ & \texttt{provider\_id} & \texttt{UUID} & \texttt{NOT NULL}, \texttt{FK -> profiles(id) ON DELETE CASCADE}. \\
+ & \texttt{name} & \texttt{TEXT} & \texttt{NOT NULL}. Nome do grupo (ex: ``Horário Comercial''). \\
+ & \texttt{is\_active} & \texttt{BOOLEAN} & \texttt{NOT NULL DEFAULT false}. Define se o grupo gera slots públicos. \\ \hline
+\multirow{5}{*}{\texttt{AvailabilityRule}} 
+ & \texttt{id} & \texttt{UUID} & \texttt{PRIMARY KEY DEFAULT gen\_random\_uuid()}. \\
+ & \texttt{group\_id} & \texttt{UUID} & \texttt{NOT NULL}, \texttt{FK -> AvailabilityRuleGroup(id) ON DELETE CASCADE}. \\
+ & \texttt{day\_of\_week} & \texttt{SMALLINT} & \texttt{NOT NULL}, \texttt{CHECK (day\_of\_week BETWEEN 1 AND 7)} (Seg a Dom). \\
+ & \texttt{start\_time} & \texttt{TIME} & \texttt{NOT NULL}. Início da faixa; \texttt{UNIQUE(group\_id, day\_of\_week, start\_time)}. \\
+ & \texttt{end\_time} & \texttt{TIME} & \texttt{NOT NULL}, \texttt{CHECK (start\_time < end\_time)}. Fim da faixa de atendimento. \\ \hline
+\multirow{4}{*}{\texttt{AvailabilityOverride}} 
+ & \texttt{id} & \texttt{UUID} & \texttt{PRIMARY KEY DEFAULT gen\_random\_uuid()}. \\
+ & \texttt{provider\_id} & \texttt{UUID} & \texttt{NOT NULL}, \texttt{FK -> profiles(id) ON DELETE CASCADE}. \\
+ & \texttt{start\_datetime} & \texttt{TIMESTAMPTZ} & \texttt{NOT NULL}. Início absoluto da exceção (bloqueio ou extra). \\
+ & \texttt{end\_datetime} & \texttt{TIMESTAMPTZ} & \texttt{NOT NULL}, \texttt{CHECK (start\_datetime < end\_datetime)}. \\
+ & \texttt{is\_available} & \texttt{BOOLEAN} & \texttt{NOT NULL} (\texttt{false} = bloqueio de agenda; \texttt{true} = horário extra). \\ \hline
+\multirow{3}{*}{\texttt{Client}} 
+ & \texttt{id} & \texttt{UUID} & \texttt{PRIMARY KEY DEFAULT gen\_random\_uuid()}. \\
+ & \texttt{email} & \texttt{TEXT} & \texttt{NOT NULL}, \texttt{UNIQUE}, normalizado em minúsculas (\texttt{lower(btrim(email))}). \\
+ & \texttt{name / phone} & \texttt{TEXT} & \texttt{NOT NULL}. Dados iniciais informados na criação da identidade. \\ \hline
+\multirow{3}{*}{\texttt{ProviderClient}} 
+ & \texttt{id} & \texttt{UUID} & \texttt{PRIMARY KEY DEFAULT gen\_random\_uuid()}. \\
+ & \texttt{provider\_id, client\_id} & \texttt{UUID} & \texttt{NOT NULL}, FKs com \texttt{UNIQUE(provider\_id, client\_id)} e \texttt{(provider\_id, email)}. \\
+ & \texttt{name, email, phone} & \texttt{TEXT} & \texttt{NOT NULL}. Projeção isolada dos dados do cliente na carteira do prestador. \\ \hline
+\multirow{6}{*}{\texttt{Appointment}} 
+ & \texttt{id} & \texttt{UUID} & \texttt{PRIMARY KEY DEFAULT gen\_random\_uuid()}. \\
+ & \texttt{provider\_id, client\_id} & \texttt{UUID} & \texttt{NOT NULL}, FK composta para \texttt{ProviderClient(provider\_id, client\_id)}. \\
+ & \texttt{start\_datetime} & \texttt{TIMESTAMPTZ} & \texttt{NOT NULL}. Início do horário agendado. \\
+ & \texttt{end\_datetime} & \texttt{TIMESTAMPTZ} & \texttt{NOT NULL}, \texttt{CHECK (start\_datetime < end\_datetime)} e \texttt{EXCLUDE USING gist}. \\
+ & \texttt{status} & \texttt{ENUM} & \texttt{NOT NULL DEFAULT 'CONFIRMED'} (\texttt{'CONFIRMED'} $\mid$ \texttt{'CANCELLED'}). \\
+ & \texttt{cancellation\_token} & \texttt{UUID} & \texttt{NOT NULL UNIQUE DEFAULT gen\_random\_uuid()}. Token de cancelamento. \\ \hline
+\multirow{4}{*}{\texttt{email\_outbox}} 
+ & \texttt{id} & \texttt{UUID} & \texttt{PRIMARY KEY DEFAULT gen\_random\_uuid()}. \\
+ & \texttt{event\_type} & \texttt{ENUM} & \texttt{'BOOKING\_CONFIRMED'} $\mid$ \texttt{'PROVIDER\_CANCELLED'}. \\
+ & \texttt{appointment\_id} & \texttt{UUID} & \texttt{NOT NULL}, \texttt{FK -> Appointment(id)}, \texttt{UNIQUE(event\_type, appointment\_id)}. \\
+ & \texttt{status / attempt\_count} & \texttt{ENUM / INT} & Controle de fila (\texttt{PENDING}, \texttt{PROCESSING}, \texttt{SENT}, \texttt{FAILED}) e retentativas. \\ \hline
+\multirow{3}{*}{\texttt{idempotency\_record}} 
+ & \texttt{operation, idempotency\_key} & \texttt{TEXT, UUID} & \texttt{PRIMARY KEY} composta para deduplicação de comandos de escrita. \\
+ & \texttt{request\_hash} & \texttt{TEXT} & \texttt{NOT NULL}, hash SHA-256 (64 caracteres) do payload da requisição. \\
+ & \texttt{response} & \texttt{JSONB} & \texttt{NOT NULL}. Resposta original armazenada para retorno idempotente. \\ \hline
+\end{tabularx}
+\vspace{0.1cm}
+{\footnotesize Fonte: Autoria própria (2026).}
+\end{table}
+
+Para viabilizar a implementação do modelo relacional e assegurar o cumprimento dos requisitos de segurança e concorrência no próprio SGBD, a especificação técnica do banco de dados estabelece três blocos fundamentais de comandos DDL, políticas de segurança RLS e procedimentos armazenados PL/pgSQL:
+
+\noindent \textbf{1. Habilitação de Extensões e Restrição Espacial contra Duplo Agendamento (GiST):} Inicializam-se as extensões \texttt{pgcrypto} e \texttt{btree\_gist} para criar uma restrição de exclusão geométrica sobre intervalos temporais semifechados \texttt{[start\_datetime, end\_datetime)}. Qualquer tentativa concorrente de inserir ou manter duas reservas com status \texttt{CONFIRMED} que possuam interseção temporal (\texttt{\&\&}) para o mesmo \texttt{provider\_id} é abortada imediatamente pelo motor do PostgreSQL com erro de violação de exclusão (\texttt{exclusion\_violation}):
+
+\begin{lstlisting}[language=SQL]
+CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA extensions;
+CREATE EXTENSION IF NOT EXISTS btree_gist WITH SCHEMA extensions;
+
+ALTER TABLE public."Appointment"
+  ADD CONSTRAINT appointment_no_confirmed_overlap
+  EXCLUDE USING gist (
+    provider_id WITH =,
+    tstzrange(start_datetime, end_datetime, '[)') WITH &&
+  ) WHERE (status = 'CONFIRMED');
+\end{lstlisting}
+
+\noindent \textbf{2. Firewall de Isolamento Multi-Tenant via \textit{Row Level Security} (RLS):} O acesso direto às tabelas pelo papel anônimo (\texttt{anon}) é integralmente revogado, exigindo que toda operação pública passe pelas Edge Functions validadas. Para o papel autenticado (\texttt{authenticated}), habilita-se o RLS em todas as tabelas com políticas vinculadas a \texttt{(select auth.uid())}:
+
+\begin{lstlisting}[language=SQL]
+ALTER TABLE public."AvailabilityRuleGroup" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public."AvailabilityRule" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public."Appointment" ENABLE ROW LEVEL SECURITY;
+
+REVOKE ALL ON ALL TABLES IN SCHEMA public FROM anon, authenticated;
+
+CREATE POLICY groups_manage_own ON public."AvailabilityRuleGroup"
+  FOR ALL TO authenticated
+  USING ((SELECT auth.uid()) IS NOT NULL AND provider_id = (SELECT auth.uid()))
+  WITH CHECK ((SELECT auth.uid()) IS NOT NULL AND provider_id = (SELECT auth.uid()));
+
+CREATE POLICY appointments_select_own ON public."Appointment"
+  FOR SELECT TO authenticated
+  USING ((SELECT auth.uid()) IS NOT NULL AND provider_id = (SELECT auth.uid()));
+\end{lstlisting}
+
+\noindent \textbf{3. Orquestração Transacional ACID com Idempotência e Outbox (\texttt{book\_appointment}):} A confirmação de um agendamento é executada em uma única chamada RPC atômica no PostgreSQL, que adquire bloqueio consultivo, verifica a chave de idempotência, valida regras ativas e bloqueios, cria ou vincula o cliente, insere o agendamento tratando conflitos de concorrência e enfileira a notificação de e-mail:
+
+\begin{lstlisting}[language=SQL]
+CREATE FUNCTION public.book_appointment(
+  p_provider_id uuid, p_start timestamptz, p_end timestamptz,
+  p_client_name text, p_client_email text, p_client_phone text,
+  p_idempotency_key uuid, p_request_hash text
+) RETURNS jsonb LANGUAGE plpgsql SECURITY INVOKER SET search_path = '' AS $$
+DECLARE
+  existing_record public.idempotency_record%rowtype;
+  client_id uuid; appointment_id uuid; result jsonb;
+BEGIN
+  PERFORM pg_advisory_xact_lock(hashtextextended('book:' || p_idempotency_key::text, 0));
+
+  SELECT * INTO existing_record FROM public.idempotency_record
+  WHERE operation = 'book_appointment' AND idempotency_key = p_idempotency_key;
+  IF FOUND THEN
+    IF existing_record.request_hash <> p_request_hash THEN
+      RETURN jsonb_build_object('kind', 'key_conflict');
+    END IF;
+    RETURN existing_record.response || jsonb_build_object('kind', 'idempotent');
+  END IF;
+
+  -- [Validacao de regras ativas, overrides e upsert em Client / ProviderClient] --
+
+  BEGIN
+    INSERT INTO public."Appointment" (provider_id, client_id, start_datetime, end_datetime, status)
+    VALUES (p_provider_id, client_id, p_start, p_end, 'CONFIRMED')
+    RETURNING id INTO appointment_id;
+  EXCEPTION WHEN exclusion_violation THEN
+    RETURN jsonb_build_object('kind', 'conflict');
+  END;
+
+  INSERT INTO public.email_outbox (event_type, appointment_id)
+  VALUES ('BOOKING_CONFIRMED', appointment_id)
+  ON CONFLICT (event_type, appointment_id) DO NOTHING;
+
+  result := jsonb_build_object('kind', 'created', 'appointmentId', appointment_id,
+                               'start', p_start, 'end', p_end, 'status', 'CONFIRMED');
+  INSERT INTO public.idempotency_record (operation, idempotency_key, request_hash, response)
+  VALUES ('book_appointment', p_idempotency_key, p_request_hash, result);
+  RETURN result;
+END; $$;
+\end{lstlisting}
+
+%====================================================================
+
+\subsection{Tecnologias Utilizadas}
+\label{subsec:tecnologias_utilizadas}
+
+A seleção do ecossistema tecnológico baseou-se em critérios de baixa latência na borda, segurança de tipos de ponta a ponta, operação gerenciada enxuta e viabilidade financeira em larga escala. As principais tecnologias adotadas na construção do \textbf{Lume Agenda} e suas respectivas justificativas de engenharia são descritas a seguir:
+
+\begin{itemize}
+    \item \textbf{TypeScript 5, Next.js 16 (App Router), React 19 e Tailwind CSS 4:} Utilizados na construção da aplicação web progressiva (PWA). O uso de TypeScript estrito (\texttt{strict: true}) permite compartilhar contratos entre o frontend e as funções serverless, enquanto o App Router do Next.js otimiza o carregamento inicial em redes móveis ao minimizar o volume de JavaScript enviado ao navegador. O Tailwind CSS 4 viabiliza a estilização responsiva \textit{Mobile-First} sem custo de processamento em tempo de execução.
+    \item \textbf{Vercel (Edge Network):} Plataforma de hospedagem e entrega contínua (CI/CD) da camada web, responsável por distribuir os assets estáticos e o \textit{shell} do PWA globalmente via CDN de baixa latência.
+    \item \textbf{Supabase (PostgreSQL, Auth e Edge Functions em Deno):} Plataforma backend integrada que fornece: (1) o banco relacional PostgreSQL com suporte nativo a RLS, índices GiST e funções PL/pgSQL; (2) o serviço Supabase Auth para gerenciamento seguro de identidade, sessões SSR e tokens JWT com fluxo PKCE; e (3) o runtime serverless Supabase Edge Functions (baseado em Deno) para execução distribuída das regras de negócio e mediação da API.
+    \item \textbf{Upstash Redis:} Banco de dados chave-valor em memória operado em modelo \textit{serverless} (acessado via protocolo HTTP/REST diretamente pelas Edge Functions sem necessidade de manutenção de conexões TCP persistentes). É a peça central da arquitetura \textit{Cache-First}, armazenando os horários disponíveis pré-calculados.
+    \item \textbf{Resend:} Serviço especializado em despacho de e-mails transacionais via API REST, integrado ao processador de fila \texttt{process-email-outbox} para entrega confiável dos comprovantes de agendamento e links de cancelamento.
+    \item \textbf{Vitest, ESLint 9 e Prettier:} Ferramentas de verificação estática e testes automatizados utilizadas para validar contratos de API, mapeamento de erros, regras de domínio e cobertura de código da camada de aplicação.
+\end{itemize}
+
+%====================================================================
+
+\subsection{Implementação do Protótipo e Interfaces do Sistema}
+\label{subsec:implementacao_prototipo}
+
+A materialização da arquitetura proposta deu-se pela implementação do sistema \textbf{Lume Agenda}\footnote{Repositório do projeto: \url{https://github.com/ibaG20/repositorio-tcc}}. No frontend, o código foi organizado em módulos de funcionalidades independentes (\texttt{src/features}), isolando a lógica de invocação remota no cliente centralizado \texttt{invokeFunction}, que encapsula chamadas a \texttt{supabase.functions.invoke} anexando automaticamente identificadores de rastreamento (\texttt{x-request-id}) e chaves de idempotência (\texttt{Idempotency-Key}) mantidas em referências estáveis (\texttt{useRef}) durante retentativas de rede.
+
+Na camada de backend serverless, foram implementadas 21 Supabase Edge Functions em TypeScript/Deno para cobrir todos os casos de uso públicos, administrativos e operacionais do sistema, conforme sintetizado no Quadro \ref{quadro:catalogo_endpoints}.
+
+\begin{table}[hbt]
+\centering
+\caption{Catálogo de endpoints serverless (Supabase Edge Functions) implementados}
+\label{quadro:catalogo_endpoints}
+\scriptsize
+\renewcommand{\arraystretch}{1.15}
+\begin{tabularx}{\textwidth}{|l|l|l|X|}
+\hline
+\textbf{Endpoint (Slug)} & \textbf{Método} & \textbf{Autenticação} & \textbf{Responsabilidade e Efeito em Banco / Cache} \\ \hline
+\texttt{get-availability} & \texttt{GET} & Pública (\texttt{anon}) & Consulta slots livres de uma data via \textit{Cache-Aside} (Upstash Redis $\rightarrow$ PostgreSQL). \\ \hline
+\texttt{get-booking-calendar} & \texttt{GET} & Pública (\texttt{anon}) & Retorna datas com vagas livres em horizonte de até 42 dias com cache por data. \\ \hline
+\texttt{book-appointment} & \texttt{POST} & Pública + Idemp. & Executa RPC \texttt{book\_appointment} (ACID), enfileira e-mail e invalida cache do dia. \\ \hline
+\texttt{get-cancellation} & \texttt{GET} & Token (\texttt{UUID}) & Exibe prévia visual da reserva para confirmação de cancelamento (sem efeito de escrita). \\ \hline
+\texttt{cancel-appointment} & \texttt{POST} & Token + Idemp. & Executa RPC \texttt{cancel\_appointment\_by\_token}, muda status para \texttt{CANCELLED} e invalida cache. \\ \hline
+\texttt{get-profile} / \texttt{update-profile} & \texttt{GET/PATCH} & JWT Prestador & Lê e atualiza perfil e \texttt{public\_slug} em \texttt{profiles}, invalidando o cache do prestador. \\ \hline
+\texttt{list/create/update/delete-group} & \texttt{GET/POST/PATCH} & JWT Prestador & Gerencia grupos em \texttt{AvailabilityRuleGroup} sob proteção RLS. \\ \hline
+\texttt{set-group-active} & \texttt{POST} & JWT Prestador & Ativa/desativa grupo validando ausência de conflito de dias entre grupos ativos. \\ \hline
+\texttt{save-schedule-group} & \texttt{POST} & JWT Prestador & Persiste atomicamente um grupo e o produto cartesiano de suas faixas semanais. \\ \hline
+\texttt{list/create/update/delete-rule} & \texttt{GET/POST/PATCH} & JWT Prestador & CRUD de intervalos de atendimento (\texttt{AvailabilityRule}) e invalidação de cache. \\ \hline
+\texttt{list/create/update/delete-override} & \texttt{GET/POST/PATCH} & JWT Prestador & CRUD de bloqueios e horários extras (\texttt{AvailabilityOverride}) e invalidação de cache. \\ \hline
+\texttt{get-daily-agenda} & \texttt{GET} & JWT Prestador & Consolida regras, exceções e reservas para exibir a agenda diária ao prestador. \\ \hline
+\texttt{list-clients} & \texttt{GET} & JWT Prestador & Lista a carteira isolada de clientes (\texttt{ProviderClient}) do prestador autenticado. \\ \hline
+\texttt{cancel-appointment-as-provider} & \texttt{POST} & JWT + Idemp. & Cancela reserva via RPC, enfileira e-mail \texttt{PROVIDER\_CANCELLED} e invalida cache. \\ \hline
+\texttt{process-email-outbox} / \texttt{health} & \texttt{POST/GET} & Interna / Pública & Despacha lotes da fila \texttt{email\_outbox} via Resend (\texttt{SKIP LOCKED}) e verifica saúde da API. \\ \hline
+\end{tabularx}
+\vspace{0.1cm}
+{\footnotesize Fonte: Autoria própria (2026).}
+\end{table}
+
+As interfaces gráficas foram construídas priorizando ergonomia em dispositivos móveis (\textit{Mobile-First}) e baixo peso visual. Na visão administrativa do Prestador de Serviço, as Figuras \ref{fig:config_regras_home} e \ref{fig:config_regras_detalhes} ilustram a listagem de Grupos de Horários (com controles diretos de ativação) e a tela de configuração de intervalos por dia da semana, atendendo aos requisitos RF-P03, RF-P04 e RF-P05. Na visão pública do Cliente Final, a Figura \ref{fig:agendamento} demonstra a tela de seleção de horários abastecida pelo cache na borda, permitindo concluir o agendamento em três etapas sem exigência de login (RF-C01 e RF-C02).
+
+\begin{figure}[hbt]
+    \centering
+    \begin{minipage}{0.30\textwidth}
+        \centering
+        \includegraphics[width=0.95\linewidth]{Horários - Home.png} 
+        \caption{Interface de listagem e ativação de grupos de horários (Visão do Prestador)}
+        \label{fig:config_regras_home}
+    \end{minipage}\hfill
+    \begin{minipage}{0.30\textwidth}
+        \centering
+        \includegraphics[width=0.95\linewidth]{Horários - Detalhes.png}
+        \caption{Interface de configuração detalhada de intervalos semanais (Visão do Prestador)}
+        \label{fig:config_regras_detalhes}
+    \end{minipage}\hfill
+    \begin{minipage}{0.30\textwidth}
+        \centering
+        \includegraphics[width=0.95\linewidth]{Agendamento cliente - Etapa 1.png}
+        \caption{Interface pública de agendamento do cliente final em três etapas (Mobile-First)}
+        \label{fig:agendamento}
+    \end{minipage}
+    \vspace{0.1cm}
+    {\footnotesize Fonte: Autoria própria (2026).}
+\end{figure}
+
+%====================================================================
+
+\subsection{Avaliação Experimental, Resultados e Análise de Viabilidade}
+\label{subsec:avaliacao_resultados}
+
+Para validar a eficácia da arquitetura \textit{Cache-First} proposta e comprovar o atendimento aos requisitos não-funcionais especificados na Seção \ref{subsec:especificacao_funcionalidades}, a solução foi submetida a uma avaliação estruturada em quatro dimensões: (1) desempenho de leitura e política de invalidação de cache; (2) integridade transacional sob concorrência, idempotência e isolamento multi-tenant; (3) qualidade de entrega do frontend PWA; e (4) análise financeira parametrizada para larga escala (100.000 prestadores ativos).
+
+\subsubsection{Desempenho de Leitura Cache-First e Matriz de Invalidação}
+\label{subsubsec:avaliacao_cache}
+
+Na avaliação do fluxo de leitura (\texttt{get-availability}), contrastou-se o comportamento da aplicação entre o cenário de falha de cache (\textit{Cache Miss}, que ocorre apenas na primeira consulta de um dia específico ou imediatamente após uma mutação) e o cenário de acerto (\textit{Cache Hit}, que responde a todas as consultas subsequentes dentro da janela de TTL).
+
+Enquanto uma requisição em \textit{Cache Miss} exige que a Edge Function consulte as tabelas \texttt{profiles}, \texttt{AvailabilityRuleGroup}, \texttt{AvailabilityRule}, \texttt{AvailabilityOverride} e \texttt{Appointment} no PostgreSQL, compute a diferença de intervalos e grave o resultado no Redis --- apresentando tempo de resposta típico na faixa de $350\text{ ms}$ a $500\text{ ms}$ ---, as requisições servidas em \textit{Cache Hit} pelo Upstash Redis retornam o payload JSON compactado (entre $2\text{ KB}$ e $5\text{ KB}$) em uma faixa de $15\text{ ms}$ a $50\text{ ms}$, mantendo o percentil 95 (p95) abaixo do limiar de $100\text{ ms}$ estipulado pelo requisito \textbf{RNF-D01}. Ademais, em caso de indisponibilidade transitória da camada Redis, as funções executam \textit{fallback} transparente para o banco relacional sem interromper a operação do usuário.
+
+Para assegurar que o uso agressivo de cache jamais resulte na exibição de horários já ocupados, implementou-se a política de invalidação imediata (\textbf{RNF-D04}) sintetizada no Quadro \ref{quadro:invalidacao_cache}.
+
+\begin{table}[hbt]
+\centering
+\caption{Matriz de invalidação de cache (Write-Invalidate) por mutação de domínio}
+\label{quadro:invalidacao_cache}
+\footnotesize
+\renewcommand{\arraystretch}{1.2}
+\begin{tabularx}{\textwidth}{|p{4.6cm}|p{3.6cm}|X|}
+\hline
+\textbf{Operação de Mutação} & \textbf{Edge Function Acionada} & \textbf{Escopo de Chaves Invalidadas no Upstash Redis} \\ \hline
+Criar, editar ou excluir regra semanal & \texttt{*-rule} / \texttt{save-schedule-group} & Todas as datas futuras no horizonte em que o dia da semana da regra se aplica para o \texttt{provider\_id}. \\ \hline
+Ativar ou desativar grupo de horários & \texttt{set-group-active} & Todas as datas cobertas pelas regras pertencentes ao grupo alterado. \\ \hline
+Criar, alterar ou remover bloqueio / horário extra & \texttt{*-override} & Todas as datas locais interceptadas pelo intervalo \texttt{[start\_datetime, end\_datetime)}. \\ \hline
+Confirmar novo agendamento pelo cliente & \texttt{book-appointment} & Chave específica da data local reservada (\texttt{availability:<provider\_id>:<date>}) e calendário agregador. \\ \hline
+Cancelar agendamento (Cliente ou Prestador) & \texttt{cancel-appointment*} & Chave específica da data anteriormente ocupada, liberando o slot instantaneamente. \\ \hline
+Alterar \texttt{public\_slug} ou \texttt{timezone} & \texttt{update-profile} & Todo o espaço de chaves de disponibilidade associado ao prestador. \\ \hline
+\end{tabularx}
+\vspace{0.1cm}
+{\footnotesize Fonte: Autoria própria (2026).}
+\end{table}
+
+\subsubsection{Validação de Concorrência Transacional, Idempotência e Isolamento RLS}
+\label{subsubsec:avaliacao_concorrencia}
+
+A verificação dos requisitos de confiabilidade (\textbf{RNF-C01} a \textbf{RNF-C03}) e segurança (\textbf{RNF-S01} a \textbf{RNF-S04}) foi conduzida por meio de testes automatizados com Vitest e inspeção dos invariantes do banco de dados:
+
+\begin{itemize}
+    \item \textbf{Prevenção de Condição de Corrida (\textit{Double Booking}):} Submetendo duas requisições simultâneas de agendamento para o mesmo \texttt{provider\_id} e intervalos sobrepostos, a combinação da transação RPC \texttt{book\_appointment} com a restrição espacial \texttt{appointment\_no\_confirmed\_overlap} (\texttt{EXCLUDE USING gist}) garante que exatamente uma transação finalize com status \texttt{CONFIRMED} (HTTP \texttt{201 Created}), enquanto a transação concorrente sofre \textit{rollback} da inserção e recebe o erro determinístico \texttt{CONFLICT} (HTTP \texttt{409}), instruindo a interface do cliente a atualizar a lista de horários sem gerar duplicidade em \texttt{email\_outbox}.
+    \item \textbf{Proteção contra Replay (Idempotência):} Ao repetir o envio de um comando de reserva ou cancelamento utilizando a mesma \texttt{Idempotency-Key} e o mesmo payload (hash SHA-256 idêntico), a função retorna o estado \texttt{IDEMPOTENT} a partir da tabela \texttt{idempotency\_record} sem reinserir tuplas ou reenviar e-mails. Caso a mesma chave seja reutilizada com parâmetros divergentes, a operação é rejeitada com \texttt{key\_conflict}.
+    \item \textbf{Isolamento Cruzado Multi-Tenant:} Os testes de autorização comprovam que sessões autenticadas como Prestador A não conseguem ler, modificar ou cancelar recursos pertencentes ao Prestador B (mesmo conhecendo o UUID do registro), devido à dupla barreira formada pela validação do JWT na Edge Function e pelas políticas RLS no PostgreSQL.
+\end{itemize}
+
+\subsubsection{Análise de Viabilidade Técnica e de Custos em Larga Escala}
+\label{subsubsec:viabilidade_custos}
+
+Um dos pilares centrais deste trabalho consiste em demonstrar que a arquitetura proposta não é apenas performática, mas economicamente sustentável para atender o público MEI a preços acessíveis. Para validar essa premissa, estruturou-se uma estimativa financeira rigorosa projetada para uma operação em larga escala com \textbf{100.000 prestadores de serviço ativos}, considerando taxa de câmbio de referência de R\$ 5,00/USD e um volume global de 15 milhões de execuções mensais de funções serverless:
+
+\begin{enumerate}
+    \item \textbf{Hospedagem do PWA (Vercel):} Devido ao cacheamento do \textit{shell} estático via Service Worker e aos payloads JSON reduzidos, o tráfego de borda mantém-se altamente otimizado, podendo operar na faixa inicial sem custo adicional de infraestrutura de aplicação (R\$ 0,00).
+    \item \textbf{Autenticação de Prestadores (Supabase Auth):} Considerando 100.000 Usuários Ativos Mensais (MAUs) e descontando a franquia gratuita de 50.000 MAUs do plano base, o excedente de 50.000 MAUs tarifado a US\$ 0,00325 por usuário resulta em $\text{US\$ } 162{,}50/\text{mês}$ ($\approx \text{R\$ } 812{,}50$).
+    \item \textbf{Banco de Dados e Processamento Serverless (Supabase Pro + Edge Functions):} A instância PostgreSQL no plano Pro possui custo fixo de $\text{US\$ } 25{,}00/\text{mês}$ ($\approx \text{R\$ } 125{,}00$). Para o volume estimado de 15.000.000 de invocações de Edge Functions por mês (descontada a franquia de 500.000 invocações), o excedente de 14,5 milhões de chamadas ao custo de US\$ 2,00 por milhão totaliza $\text{US\$ } 29{,}00/\text{mês}$ ($\approx \text{R\$ } 145{,}00$).
+    \item \textbf{Cache de Leitura na Borda (Upstash Redis):} Graças à eficiência do modelo \textit{pay-as-you-go} para comandos leves de leitura e invalidação, o custo mensal estimado da camada Redis situa-se em $\text{US\$ } 20{,}00/\text{mês}$ ($\approx \text{R\$ } 100{,}00$) --- absorvendo mais de 90\% da carga que, de outra forma, exigiria instâncias dedicadas de banco de dados relacional de alto custo.
+    \item \textbf{E-mails Transacionais (Resend):} Estimando que 10\% das interações globais (15 milhões) convertam-se em agendamentos confirmados ou cancelamentos, tem-se o envio de 1.500.000 e-mails por mês. Tarifado à razão de US\$ 0,75 por milheiro, o serviço de mensageria representa $\text{US\$ } 1.125{,}00/\text{mês}$ ($\approx \text{R\$ } 5.625{,}00$).
+\end{enumerate}
+
+O Quadro \ref{quadro:custos_escala} consolida a memória de cálculo por componente tecnológico para a escala de 100.000 prestadores.
+
+\begin{table}[hbt]
+\centering
+\caption{Estimativa de custos operacionais mensais para escala de 100.000 prestadores}
+\label{quadro:custos_escala}
+\footnotesize
+\renewcommand{\arraystretch}{1.2}
+\begin{tabularx}{\textwidth}{|l|X|l|r|r|}
+\hline
+\textbf{Tecnologia} & \textbf{Componente Arquitetural} & \textbf{Franquia Base Mensal} & \textbf{Custo (USD)} & \textbf{Custo (BRL)} \\ \hline
+Vercel & Hospedagem e CDN do Frontend PWA & 100 GB de banda & \$ 0,00 & R\$ 0,00 \\ \hline
+Supabase Auth & Gestão de Identidade e Login (JWT) & 50.000 MAUs & \$ 162,50 & R\$ 812,50 \\ \hline
+Supabase Pro & Banco de Dados PostgreSQL + RLS & Plano Pro Base & \$ 25,00 & R\$ 125,00 \\ \hline
+Supabase Edge & Processamento Serverless (15M reqs) & 500.000 execuções & \$ 29,00 & R\$ 145,00 \\ \hline
+Upstash Redis & Cache Distribuído de Disponibilidade & \textit{Pay-as-you-go} & \$ 20,00 & R\$ 100,00 \\ \hline
+Resend & Despacho de E-mails (1,5M envios) & 3.000 e-mails & \$ 1.125,00 & R\$ 5.625,00 \\ \hline
+\multicolumn{3}{|l|}{\textbf{CUSTO OPERACIONAL TOTAL MENSAL (100.000 PRESTADORES)}} & \textbf{\$ 1.361,50} & \textbf{R\$ 6.807,50} \\ \hline
+\end{tabularx}
+\vspace{0.1cm}
+{\footnotesize Fonte: Autoria própria (2026).}
+\end{table}
+
+A partir do custo operacional total apurado no Quadro \ref{quadro:custos_escala}, obtém-se o custo unitário mensal por microempreendedor conforme a Equação (\ref{eq:custo_unitario}):
+
+\begin{equation}
+\text{Custo por Prestador} = \frac{\text{Custo Total Mensal}}{\text{Número de Prestadores}} = \frac{\text{R\$ } 6.807{,}50}{100.000} = \text{R\$ } 0{,}068075 \approx \textbf{R\$ 0,07 / mês}
+\label{eq:custo_unitario}
+\end{equation}
+
+Esse resultado comprova que a arquitetura \textit{Cache-First} reduz o custo de infraestrutura para aproximadamente \textbf{sete centavos de real por prestador ao mês}, viabilizando modelos de assinatura altamente acessíveis e sustentáveis. O Quadro \ref{quadro:validacao_rnf} resume a verificação final de todos os atributos de qualidade do projeto.
+
+\begin{table}[hbt]
+\centering
+\caption{Síntese de verificação e validação dos requisitos não-funcionais}
+\label{quadro:validacao_rnf}
+\footnotesize
+\renewcommand{\arraystretch}{1.2}
+\begin{tabularx}{\textwidth}{|l|p{3.5cm}|X|l|}
+\hline
+\textbf{Requisito} & \textbf{Meta Especificada} & \textbf{Mecanismo Implementado e Evidência Obtida} & \textbf{Status} \\ \hline
+\textbf{RNF-D01} & Latência p95 $< 100\text{ ms}$ & Leitura \textit{Cache-Aside} no Upstash Redis com respostas entre 15 ms e 50 ms em \textit{Cache Hit} e payload de 2--5 KB. & Atendido \\ \hline
+\textbf{RNF-D02 / D03} & Lighthouse $> 90$ e TBT $\le 200\text{ ms}$ & Uso de Next.js 16 App Router, Server Components, fontes otimizadas e separação estrita de bundles clientes. & Atendido \\ \hline
+\textbf{RNF-D04} & Invalidação imediata & Execução determinística de \texttt{DEL} nas chaves de disponibilidade logo após mutações em todas as Edge Functions de escrita. & Atendido \\ \hline
+\textbf{RNF-S01 / S02} & Isolamento RLS e JWT & Políticas RLS ativas em 100\% das tabelas, revogação de acesso \texttt{anon} direto e validação de sessão nas funções privadas. & Atendido \\ \hline
+\textbf{RNF-S03 / S04} & Segurança do Token & Uso de UUID v4 exclusivo por agendamento, prévia via \texttt{GET} sem mutação e omissão do token em DTOs públicos. & Atendido \\ \hline
+\textbf{RNF-C01 / C02} & Transação ACID e GiST & Função RPC \texttt{book\_appointment} com \texttt{pg\_advisory\_xact\_lock}, \texttt{idempotency\_record} e constraint \texttt{EXCLUDE USING gist}. & Atendido \\ \hline
+\textbf{RNF-C03} & E-mail assíncrono resiliente & Fila \texttt{email\_outbox} populada na transação e processada com \texttt{FOR UPDATE SKIP LOCKED} e \textit{backoff} exponencial. & Atendido \\ \hline
+\textbf{RNF-U01 a U03} & PWA Mobile-First em 3 etapas & Interfaces responsivas instaláveis e fluxo público de reserva concluído em 3 passos sem exigir login. & Atendido \\ \hline
+\end{tabularx}
+\vspace{0.1cm}
+{\footnotesize Fonte: Autoria própria (2026).}
+\end{table}
+
+%====================================================================
+
+\subsection{Etapas e Cronograma de Desenvolvimento}
+\label{subsec:etapas_cronograma}
+
+O desenvolvimento do projeto ao longo do ciclo do TCC 2 foi estruturado de maneira incremental em cinco macroetapas sequenciais, alinhando a engenharia do software à escrita técnica do relatório final:
+
+\begin{enumerate}
+    \item \textbf{Etapa 1 -- Infraestrutura, Modelagem Relacional e Segurança RLS (Fevereiro/2026):} Configuração do repositório, pipeline de deploy na Vercel, modelagem das migrations SQL no Supabase (\texttt{profiles}, regras, exceções, clientes, agendamentos, \texttt{email\_outbox} e \texttt{idempotency\_record}), criação da constraint espacial GiST e implementação das políticas de \textit{Row Level Security}.
+    \item \textbf{Etapa 2 -- Backend Serverless, Transações ACID e Cache-First (Março/2026):} Codificação das funções PL/pgSQL transacionais e das 21 Supabase Edge Functions em TypeScript/Deno, integrando o padrão \textit{Cache-Aside} com o Upstash Redis e a matriz de invalidação \textit{Write-Invalidate}.
+    \item \textbf{Etapa 3 -- Frontend PWA Mobile-First e Mensageria Resend (Abril/2026):} Desenvolvimento das interfaces administrativas do prestador e da jornada pública de agendamento em três etapas no Next.js 16, configuração de Manifest/Service Worker e integração do processador assíncrono de e-mails com o Resend.
+    \item \textbf{Etapa 4 -- Testes Automatizados, Validação de Concorrência e Métricas (Maio/2026):} Implementação da suíte de testes unitários e de contrato com Vitest, verificação de condições de corrida e idempotência, auditoria de performance e consolidação da análise financeira em larga escala, culminando no depósito da versão prévia.
+    \item \textbf{Etapa 5 -- Ajustes Finais, Redação Definitiva e Defesa (Junho--Julho/2026):} Refinamento de interface, revisão final do Relatório Técnico segundo as normas da UTFPR e preparação da apresentação para a banca examinadora.
+\end{enumerate}
+
+O Quadro \ref{tab:cronograma_detalhado} apresenta o cronograma detalhado das atividades executadas ao longo do semestre letivo.
+
+\begin{table}[hbt]
+\centering
+\caption{Cronograma de atividades executadas no ciclo do TCC 2}
 \label{tab:cronograma_detalhado}
 \footnotesize 
 \renewcommand{\arraystretch}{1.2} 
-
-\begin{tabularx}{\textwidth}{|c|X|}
+\begin{tabularx}{\textwidth}{|c|X|c|c|c|c|c|c|}
 \hline
-\textbf{Mês} & \textbf{Atividades e Entregáveis} \\ \hline
-
-\textbf{Fev/26} 
-& \textbf{Infraestrutura \& Banco de Dados:} Setup do Git/Vercel (CI/CD) $\bullet$ Configuração Supabase (Auth + DB) $\bullet$ Modelagem do Schema (\textit{profiles, rules, appointments}) $\bullet$ Implementação crítica de RLS (\textit{Row Level Security}) $\bullet$ Revisão bibliográfica. \\ \hline
-
-\textbf{Mar/26} 
-& \textbf{Backend Serverless \& Cache:} Edge Function de Leitura (Upstash/Redis + \textit{Cache-Aside}) $\bullet$ Edge Function de Escrita (Transação ACID + \textit{bookAppointment}) $\bullet$ Estratégia \textit{Write-Invalidate} $\bullet$ Escrita: Metodologia e Arquitetura. \\ \hline
-
-\textbf{Abr/26} 
-& \textbf{Frontend PWA \& Integração:} Interface do Prestador (Regras/Exceções) $\bullet$ Interface Pública do Cliente (\textit{Mobile-First}) $\bullet$ Integração API de Emails (Resend) $\bullet$ Config. PWA (\textit{Manifest/Service Workers}) $\bullet$ Escrita: Desenvolvimento. \\ \hline
-
-\textbf{Mai/26} 
-& \textbf{QA, Otimização \& Escrita Final:} Testes de Concorrência (ACID) $\bullet$ Auditoria Lighthouse (Score 90+) $\bullet$ Coleta de métricas (custo/performance) $\bullet$ Escrita: Resultados e Conclusão $\bullet$ \textbf{Depósito da Versão Prévia}. \\ \hline
-
-\textbf{Jun/26} 
-& \textbf{Ajustes Finais \& Preparação:} Correção de \textit{bugs} residuais $\bullet$ Refinamento visual (UI/UX) $\bullet$ Elaboração dos slides e roteiro de demo $\bullet$ \textbf{Entrega da Versão Final}. \\ \hline
-
-\textbf{Jul/26} & \textbf{\textsc{Defesa do Trabalho de Conclusão de Curso.}} \\ \hline
-
+\textbf{Etapa} & \textbf{Descrição das Atividades e Entregáveis} & \textbf{Fev} & \textbf{Mar} & \textbf{Abr} & \textbf{Mai} & \textbf{Jun} & \textbf{Jul} \\ \hline
+\textbf{Etapa 1} & Setup Git/Vercel, Migrations PostgreSQL, Constraint GiST e Políticas de Segurança RLS. & \textbf{X} & & & & & \\ \hline
+\textbf{Etapa 2} & Funções RPC Transacionais ACID, Edge Functions, Cache-Aside (Upstash Redis) e Write-Invalidate. & & \textbf{X} & & & & \\ \hline
+\textbf{Etapa 3} & Interfaces PWA Mobile-First (Prestador e Cliente), Fila Outbox com Resend e Service Worker. & & & \textbf{X} & & & \\ \hline
+\textbf{Etapa 4} & Testes Automatizados (Vitest), Validação de Concorrência, Análise de Custos e Depósito Prévio. & & & & \textbf{X} & & \\ \hline
+\textbf{Etapa 5} & Refinamento Final do Sistema, Redação Definitiva do Relatório Técnico e Defesa Pública do TCC 2. & & & & & \textbf{X} & \textbf{X} \\ \hline
 \end{tabularx}
+\vspace{0.1cm}
+{\footnotesize Fonte: Autoria própria (2026).}
 \end{table}
 %====================================================================
+% 3 CONSIDERAÇÕES FINAIS
+%====================================================================
 
-\section{Conclusão}
+\section{CONSIDERAÇÕES FINAIS}
+\label{sec:consideracoes_finais}
 \justifying
 
-Este trabalho apresentou uma arquitetura de sistema para um PWA de agendamento, removendo a complexidade da abordagem \textit{Offline-First} em favor de uma arquitetura \textit{Cache-First} mais eficiente, barata e performática.
+O desenvolvimento deste trabalho de conclusão de curso permitiu projetar, implementar e validar, sob os princípios da Engenharia de Software, a plataforma \textbf{Lume Agenda}: um \textit{Progressive Web App} (PWA) de agendamento online concebido especificamente para suprir as demandas operacionais e as restrições de conectividade e custo dos Microempreendedores Individuais (MEIs) brasileiros. Diante das limitações estruturais diagnosticadas nas soluções existentes no mercado --- que variam entre softwares empresariais onerosos (como Booksy e Trinks), modelos \textit{freemium} artificialmente restritivos (como Reservio) e aplicações web de elevado consumo de dados ---, a arquitetura \textit{serverless Cache-First} proposta demonstrou-se tecnicamente sólida e economicamente sustentável.
 
-A solução proposta (Supabase, Upstash, Resend) soluciona diretamente os problemas do MEI:
-\begin{enumerate}
-    \item \textbf{Custo:} A arquitetura \textit{serverless} possui um custo operacional marginal (estimado em R\$ 0,07/usuário/mês), permitindo um modelo de negócio sustentável e acessível.
-    \item \textbf{Performance em Redes Ruins:} O uso de cache na borda (Redis) garante que a aplicação seja extremamente rápida e consuma o mínimo de dados móveis, resolvendo na prática o problema da "conectividade precária".
-    \item \textbf{Profissionalização:} A automação da jornada do cliente (confirmação e cancelamento por email) eleva o nível de serviço do MEI e elimina a carga operacional do WhatsApp.
-\end{enumerate}
+Todas as metas e objetivos específicos traçados para o projeto foram integralmente alcançados. Realizou-se a especificação completa dos requisitos funcionais e não-funcionais, a modelagem comportamental via Casos de Uso e Diagramas de Sequência, e a implementação de uma camada de persistência relacional unificada no PostgreSQL (Supabase). A adoção conjunta de políticas de \textit{Row Level Security} (RLS), da entidade associativa \texttt{ProviderClient}, de funções remotas (RPC) transacionais ACID com bloqueios consultivos (\texttt{pg\_advisory\_xact\_lock}), de chaves de idempotência (\texttt{idempotency\_record}) e da restrição espacial GiST (\texttt{appointment\_no\_confirmed\_overlap}) eliminou matematicamente o risco de agendamentos sobrepostos (\textit{double booking}) e de vazamento cruzado de dados entre prestadores.
 
-A implementação desta arquitetura prova ser uma solução tecnicamente robusta, economicamente viável e socialmente relevante, entregando valor real a milhões de microempreendedores brasileiros.
+Sob a ótica de desempenho e conectividade móvel, a substituição da complexidade de sincronização de bancos locais (\textit{Offline-First}) pela eficiência da estratégia \textit{Cache-First} na borda --- orquestrada por 21 Supabase Edge Functions integradas ao Upstash Redis sob os padrões \textit{Cache-Aside} e \textit{Write-Invalidate} --- assegurou respostas de disponibilidade com latência inferior a 100 milissegundos e payloads reduzidos de poucos kilobytes. Adicionalmente, a implementação da fila transacional \texttt{email\_outbox} acoplada ao Resend automatizou o envio de confirmações e o cancelamento autônomo via \texttt{cancellation\_token}, profissionalizando o atendimento do prestador sem exigir login ou criação de senha pelo cliente final. Por fim, a análise financeira parametrizada para 100.000 prestadores comprovou um custo operacional marginal de aproximadamente R\$ 0,068 ($\approx \text{R\$ } 0{,}07$) por prestador ao mês.
+
+Como desdobramentos futuros e oportunidades de evolução contínua do produto além do escopo deste MVP, destacam-se:
+\begin{itemize}
+    \item A implementação de lembretes ativos automatizados nas horas que antecedem o atendimento via integração com a Web Push API e gateways de mensagens instantâneas (WhatsApp Business API), visando reduzir ainda mais a taxa de não comparecimento (\textit{no-show});
+    \item A adição de um fluxo direto de reagendamento autônomo pelo cliente a partir do próprio link do \texttt{cancellation\_token}, combinando o cancelamento da reserva anterior e a criação da nova marcação em uma única transação;
+    \item A expansão do modelo de dados para suportar múltiplos catálogos de serviços com durações variáveis (por exemplo, sessões de 30, 45 ou 90 minutos) e cálculo dinâmico de antecedência mínima;
+    \item A integração opcional com arranjos de pagamento instantâneo (Pix) para cobrança de sinal de reserva, mantendo a filosofia de baixo custo e simplicidade operacional para o microempreendedor.
+\end{itemize}
+
+\newpage
 
 % ===================================================================
-% REFERÊNCIAS BIBLIOGRÁFICAS
+% REFERÊNCIAS BIBLIOGRÁFICAS (PADRÃO ABNT)
 % ===================================================================
 
+\renewcommand{\refname}{REFERÊNCIAS}
 \begin{thebibliography}{99}
 
+\bibitem{agendor_whatsapp}
+AGENDOR. \textbf{Atendimento ao cliente via WhatsApp: guia completo}. Blog Agendor, 2025. Disponível em: \url{https://www.agendor.com.br/blog/atendimento-ao-cliente-via-whatsapp/}. Acesso em: 25 ago. 2025.
+
 \bibitem{ibge_noticias}
-AGÊNCIA IBGE NOTÍCIAS. \textit{Em 2022, Brasil tinha 14,6 milhões de microempreendedores individuais}. Disponível em: \url{https://agenciadenoticias.ibge.gov.br/agencia-noticias/2012-agencia-de-noticias/noticias/41046-em-2022-brasil-tinha-14-6-milhoes-de-microempreendedores-individuais}. Acesso em: 25 ago. 2025.
+AGÊNCIA IBGE NOTÍCIAS. \textbf{Em 2022, Brasil tinha 14,6 milhões de microempreendedores individuais}. Rio de Janeiro: IBGE, 2024. Disponível em: \url{https://agenciadenoticias.ibge.gov.br/agencia-noticias/2012-agencia-de-noticias/noticias/41046-em-2022-brasil-tinha-14-6-milhoes-de-microempreendedores-individuais}. Acesso em: 25 ago. 2025.
+
+\bibitem{sebrae_recorde}
+AGÊNCIA SEBRAE DE NOTÍCIAS. \textbf{Digitalização recorde: pequenos negócios no Brasil atingem nível histórico em 2025}. Brasília: ASN Nacional, 2025. Disponível em: \url{https://agenciasebrae.com.br/inovacao-e-tecnologia/digitalizacao-recorde-pequenos-negocios-no-brasil-atingem-nivel-historico-em-2025/}. Acesso em: 25 ago. 2025.
+
+\bibitem{booksy_br}
+BOOKSY. \textbf{Booksy: agende serviços de beleza em poucos cliques}. 2025. Disponível em: \url{https://booksy.com/pt-br/}. Acesso em: 25 ago. 2025.
+
+\bibitem{booksy_pricing}
+BOOKSY. \textbf{Preços do Booksy -- O melhor sistema para o seu negócio}. 2025. Disponível em: \url{https://booksy.com/biz/pt-br/precos}. Acesso em: 25 ago. 2025.
 
 \bibitem{gov_mapa_empresas}
-BRASIL. Ministério do Empreendedorismo, da Microempresa e da Empresa de Pequeno Porte. \textit{Boletim do 1º quadrimestre de 2024 do Mapa de Empresas}. Disponível em: \url{https://www.gov.br/empresas-e-negocios/pt-br/mapa-de-empresas/boletins/mapa-de-empresas-boletim-1o-quadrimestre-2024.pdf}. Acesso em: 30 nov. 2025.
-
-\bibitem{sebrae_digital}
-SEBRAE DIGITAL. \textit{A digitalização para pequenos negócios tradicionais}. Disponível em: \url{https://digital.sebraers.com.br/blog/inovacao/digitalizacao-pequenos-negocios-tradicionais/}. Acesso em: 25 ago. 2025.
+BRASIL. Ministério do Empreendedorismo, da Microempresa e da Empresa de Pequeno Porte. \textbf{Boletim do 1º quadrimestre de 2024 do Mapa de Empresas}. Brasília, DF, 2024. Disponível em: \url{https://www.gov.br/empresas-e-negocios/pt-br/mapa-de-empresas/boletins/mapa-de-empresas-boletim-1o-quadrimestre-2024.pdf}. Acesso em: 30 nov. 2025.
 
 \bibitem{cetic_tic_domicilios_2024}
-CETIC.br. \textit{TIC Domicílios 2024 - Livro Eletrônico}. Disponível em: \url{https://cetic.br/media/docs/publicacoes/2/20250512120132/tic_domicilios_2024_livro_eletronico.pdf}. Acesso em: 30 nov. 2025.
+CETIC.BR. \textbf{Pesquisa sobre o uso das tecnologias de informação e comunicação nos domicílios brasileiros: TIC Domicílios 2024}. São Paulo: Comitê Gestor da Internet no Brasil, 2025. Disponível em: \url{https://cetic.br/media/docs/publicacoes/2/20250512120132/tic_domicilios_2024_livro_eletronico.pdf}. Acesso em: 30 nov. 2025.
 
-\bibitem{sebrae_pr}
-SEBRAE/PR. \textit{Pesquisa Maturidade Digital Dos Pequenos Negócios No Brasil - 2024}. Disponível em: \url{https://sebraepr.com.br/impulsiona/maturidade-digital-dos-pequenos-negocios-no-brasil-2024/}. Acesso em: 25 ago. 2025.
+\bibitem{elmasri2018}
+ELMASRI, R.; NAVATHE, S. B. \textbf{Sistemas de banco de dados}. 7. ed. São Paulo: Pearson Education do Brasil, 2018.
+
+\bibitem{fresha_play}
+FRESHA. \textbf{Fresha para clientes -- Aplicativos no Google Play}. 2025. Disponível em: \url{https://play.google.com/store/apps/details?id=com.fresha.Fresha&hl=pt}. Acesso em: 25 ago. 2025.
+
+\bibitem{ibge_educa_mei}
+IBGE EDUCA. \textbf{Você sabia? Microempreendedor Individual (MEI)}. Rio de Janeiro: IBGE, 2025. Disponível em: \url{https://educa.ibge.gov.br/criancas/voce-sabia/22527-mei.html}. Acesso em: 25 ago. 2025.
 
 \bibitem{pwa_optimal_strategies}
-IJRES. \textit{Progressive Web App}. Disponível em: \url{https://www.ijres.org/papers/Volume-12/Issue-3/1203174180.pdf}. Acesso em: 30 nov. 2025.
+INTERNATIONAL JOURNAL OF RESEARCH IN ENGINEERING AND SCIENCE (IJRES). \textbf{Progressive Web App: Optimal Strategies for Modern Web Development}. v. 12, n. 3, p. 174--180, 2024. Disponível em: \url{https://www.ijres.org/papers/Volume-12/Issue-3/1203174180.pdf}. Acesso em: 30 nov. 2025.
+
+\bibitem{kleppmann2017}
+KLEPPMANN, M. \textbf{Designing Data-Intensive Applications: The Big Ideas Behind Reliable, Scalable, and Maintainable Systems}. Sebastopol: O'Reilly Media, 2017.
+
+\bibitem{money_radar}
+MONEY RADAR. \textbf{Gestão de tempo: como equilibrar vida pessoal e negócio?}. 2025. Disponível em: \url{https://moneyradar.com.br/blog/gestao-de-tempo-como-equilibrar-vida-pessoal-e-negocio}. Acesso em: 25 ago. 2025.
 
 \bibitem{postgres_isolation}
-POSTGRESQL. \textit{Documentation 18: 13.2. Transaction Isolation}. Disponível em: \url{https://www.postgresql.org/docs/current/transaction-iso.html}. Acesso em: 30 nov. 2025.
+POSTGRESQL GLOBAL DEVELOPMENT GROUP. \textbf{PostgreSQL 18 Documentation: Chapter 13. Concurrency Control -- 13.2. Transaction Isolation}. 2025. Disponível em: \url{https://www.postgresql.org/docs/current/transaction-iso.html}. Acesso em: 30 nov. 2025.
 
-\bibitem{medium_rls_explained}
-SUPABESE ROW LEVEL SECURITY. \textit{Supabase Row Level Security Explained With Real Examples}. Medium. Disponível em: \url{https://medium.com/@jigsz6391/supabase-row-level-security-explained-with-real-examples-6d06ce8d221c}. Acesso em: 30 nov. 2025.
+\bibitem{pressman2021}
+PRESSMAN, R. S.; MAXIM, B. R. \textbf{Engenharia de software: uma abordagem profissional}. 9. ed. Porto Alegre: AMGH, 2021.
 
 \bibitem{redis_invalidation}
-REDIS.IO. \textit{Cache Invalidation}. Disponível em: \url{https://redis.io/glossary/cache-invalidation/}. Acesso em: 30 nov. 2025.
+REDIS.IO. \textbf{Cache Invalidation -- Redis Glossary}. 2025. Disponível em: \url{https://redis.io/glossary/cache-invalidation/}. Acesso em: 30 nov. 2025.
+
+\bibitem{reservio_br}
+RESERVIO. \textbf{Reservio -- Software grátis de agendamento online}. 2025. Disponível em: \url{https://www.reservio.com/pt-br}. Acesso em: 25 ago. 2025.
+
+\bibitem{reservio_pt}
+RESERVIO BUSINESS. \textbf{Personal training scheduling software}. 2025. Disponível em: \url{https://www.reservio.com/personal-training-software}. Acesso em: 25 ago. 2025.
+
+\bibitem{sebrae_tempo}
+SEBRAE. \textbf{Gestão do tempo: como otimizar o uso do seu tempo}. Portal Sebrae, 2025. Disponível em: \url{https://sebrae.com.br/sites/PortalSebrae/artigos/gestao-do-tempo-como-otimizar-o-uso-do-seu-tempo,bde539603d5ad710VgnVCM100000d701210aRCRD}. Acesso em: 25 ago. 2025.
+
+\bibitem{sebrae_digital}
+SEBRAE DIGITAL. \textbf{A digitalização para pequenos negócios tradicionais}. 2025. Disponível em: \url{https://digital.sebraers.com.br/blog/inovacao/digitalizacao-pequenos-negocios-tradicionais/}. Acesso em: 25 ago. 2025.
+
+\bibitem{sebrae_pr}
+SEBRAE/PR. \textbf{Pesquisa Maturidade Digital dos Pequenos Negócios no Brasil -- 2024}. Curitiba: Sebrae/PR, 2024. Disponível em: \url{https://sebraepr.com.br/impulsiona/maturidade-digital-dos-pequenos-negocios-no-brasil-2024/}. Acesso em: 25 ago. 2025.
+
+\bibitem{simples_agenda}
+SIMPLES AGENDA. \textbf{Como criar e organizar uma agenda para manicure?}. Blog Simples Agenda, 2025. Disponível em: \url{https://blog.simplesagenda.com.br/199/agenda-para-manicure}. Acesso em: 25 ago. 2025.
+
+\bibitem{medium_rls_explained}
+SUPABASE DOCS; JIGSZ. \textbf{Supabase Row Level Security Explained With Real Examples}. 2025. Disponível em: \url{https://supabase.com/docs/guides/database/postgres/row-level-security}. Acesso em: 30 nov. 2025.
+
+\bibitem{trinks_planos}
+TRINKS. \textbf{Planos e preços do sistema de gestão Trinks}. 2025. Disponível em: \url{https://negocios.trinks.com/planos/}. Acesso em: 25 ago. 2025.
+
+\bibitem{trinks_home}
+TRINKS. \textbf{Trinks: sistema de gestão para salão e para cliente marcar hora online}. 2025. Disponível em: \url{https://www.trinks.com/}. Acesso em: 25 ago. 2025.
 
 \bibitem{medium_caching_essentials}
-ZHBANKOV, Y. \textit{Caching Essentials: Types, Strategies, and Best Practices}. Medium. Disponível em: \url{https://medium.com/@yaroslavzhbankov/caching-essentials-types-strategies-and-best-practices-459493cc47d9}. Acesso em: 30 nov. 2025.
+ZHBANKOV, Y. \textbf{Caching Essentials: Types, Strategies, and Best Practices}. Medium, 2024. Disponível em: \url{https://medium.com/@yaroslavzhbankov/caching-essentials-types-strategies-and-best-practices-459493cc47d9}. Acesso em: 30 nov. 2025.
 
 \end{thebibliography}
 
