@@ -1,0 +1,344 @@
+\section{DESENVOLVIMENTO}
+
+\subsection{Especificação das funcionalidades}
+
+As funcionalidades foram organizadas por ator e verificadas na interface, nos hooks e nos contratos das Edge Functions. A classificação distingue o que já possui fluxo de uso completo do que existe apenas como suporte técnico.
+
+\begin{table}[H]
+\centering
+\caption{Funcionalidades e situação da implementação.}
+\label{tab:funcionalidades}
+\scriptsize
+\begin{tabularx}{\textwidth}{p{1.8cm}Yp{3.7cm}}
+\toprule
+\textbf{Ator} & \textbf{Funcionalidade} & \textbf{Situação} \\
+\midrule
+Prestador & Cadastro e login por e-mail ou Google & Implementada \\
+Prestador & Perfil, slug público e fuso horário & Implementada \\
+Prestador & Grupos de horários, dias e faixas de atendimento & Implementada \\
+Prestador & Agenda diária e estados dos compromissos & Implementada \\
+Prestador & Bloqueio, horário extra, liberação e cancelamento & Implementada \\
+Prestador & Avisos, Web Push e instalação como PWA & Implementada; push requer worker operacional \\
+Prestador & Listagem de clientes & Parcial: API e hook existem; não há tela dedicada \\
+Cliente & Acesso por link, seleção de data e horário & Implementada \\
+Cliente & Reserva com nome, e-mail e telefone, sem conta & Implementada \\
+Cliente & Confirmação por e-mail e cancelamento por token & Implementada; envio requer worker operacional \\
+\bottomrule
+\end{tabularx}
+\fontepropria
+\end{table}
+
+\subsubsection{Fluxo do prestador}
+
+Após autenticar-se, o prestador configura nome público, endereço curto e fuso horário. Em seguida, cria um grupo de disponibilidade, seleciona dias da semana e informa início e fim de cada faixa. A agenda diária reúne horários livres, bloqueios e reservas. Um intervalo específico pode ser bloqueado ou liberado sem alterar toda a recorrência; uma reserva pode ser cancelada, mas não apagada.
+
+\subsubsection{Fluxo do cliente}
+
+O cliente abre o link do prestador, escolhe uma data e um dos horários calculados pelo backend, preenche dados de contato e confirma. A API volta a validar a disponibilidade durante a transação, evitando que a seleção feita na tela seja tratada como garantia de reserva. O e-mail resultante contém o resumo e um link de cancelamento associado a token próprio.
+
+\subsubsection{Registro visual da aplicação}
+
+O fluxo de uso é representado por duas telas principais:
+a configuração de disponibilidade pelo prestador e a seleção
+de horários na página pública de reserva. Essas interfaces
+ilustram as funcionalidades centrais da Agendinha.
+
+\todoe{aqui acredito que vc deva expandir em termos de figuras... apresenta um fluxo completo... com  tela de login, tela principal, agendamento, etc... tem espaço para poder avançar no texto.}
+
+\begin{figure}[H]
+    \centering
+
+    \begin{minipage}[t]{0.47\textwidth}
+        \centering
+        \includegraphics[
+            width=\linewidth,
+            height=6cm,
+            keepaspectratio
+        ]{agendinha-prestador.png}
+
+        \caption{Configuração de horários do prestador.}
+        \label{fig:tela-prestador}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[t]{0.47\textwidth}
+        \centering
+        \includegraphics[
+            width=\linewidth,
+            height=6cm,
+            keepaspectratio
+        ]{agendinha-cliente.png}
+
+        \caption{Seleção de horários pelo cliente.}
+        \label{fig:tela-cliente}
+    \end{minipage}
+
+\end{figure}
+
+\subsubsection{Critério de simplicidade}
+
+Simplicidade não é medida apenas pelo número de telas. O desenho reduz decisões: o cliente não escolhe plano, não instala aplicativo e não cria senha; o prestador não precisa configurar infraestrutura. A avaliação com usuários proposta na Seção~\ref{sec:avaliacao} mede se essa redução se converte em tarefas concluídas sem ajuda.
+
+\subsection{Fundamentação teórica em PWA, cache e sistemas de agendamento}
+
+\todoe{ESTA SEÇÃO DEVERIA SER O CAPITULO 2. AQUI NO CAPITULO DE DESENVOLVIMENTO, APRESENTAR APENAS O QUE FOI DESENVOLVIDO.... ACHO QUE UM CAPÍTULO CHAMADO: FUNDAMENTAÇÃO TEÓRICA E TRABALHOS RELACIONADOS - FICARIA BOM... MOVE O TEXTO PARA LÁ.}
+
+\subsubsection{Digitalização enxuta e experiência mobile-first}
+
+Digitalizar um processo não significa apenas converter o caderno em uma tela. O sistema deve retirar etapas manuais, centralizar o estado e tornar o resultado verificável. No caso estudado, o ganho esperado vem da publicação automática da disponibilidade e da validação da reserva, não da inclusão de módulos administrativos. A abordagem mobile-first parte da menor largura de tela e da interação por toque, coerente com um público que pode ter o celular como principal dispositivo.
+
+\subsubsection{Progressive Web Apps}
+
+Uma Progressive Web App combina tecnologias da Web com recursos de instalação e execução semelhantes aos de aplicativos. Manifesto, HTTPS e service worker permitem adicionar a aplicação à tela inicial e controlar estratégias de rede e cache \cite{mdnpwa,w3cmanifest}. Essa alternativa evita manter projetos nativos separados e reduz a barreira de instalação. Não implica, porém, funcionamento integral sem internet: reservas precisam alcançar o servidor para que a concorrência seja resolvida sobre um estado comum.
+
+\subsubsection{Arquitetura gerenciada e Cache-Aside}
+
+Serviços gerenciados deslocam tarefas de provisionamento, atualização e disponibilidade para provedores especializados. Isso favorece equipes pequenas, embora introduza dependência externa. Na estratégia Cache-Aside, a aplicação consulta o Redis antes da fonte oficial; em caso de ausência, lê o PostgreSQL, grava uma cópia temporária e devolve o resultado \cite{fowler2002}. Uma versão por prestador invalida logicamente as chaves após mudanças. Se o Redis estiver indisponível, a consulta permanece correta, apenas potencialmente mais lenta.
+
+\subsubsection{Transações, concorrência e idempotência}
+
+O horário exibido ao cliente pode ser escolhido por outra pessoa antes da confirmação. Por isso, a verificação decisiva ocorre na transação de reserva. A restrição de exclusão do PostgreSQL impede dois intervalos confirmados sobrepostos para o mesmo prestador \cite{postgresconstraints}. A chave de idempotência associa tentativas repetidas à mesma resposta, evitando duplicação quando o cliente reenvia a requisição por perda de conexão.
+
+\subsubsection{Segurança e comunicação assíncrona}
+
+O Supabase Auth emite JWTs para identificar o prestador, enquanto as políticas de Row Level Security limitam linhas ao respectivo proprietário \cite{supabasetls}. O cliente não recebe acesso amplo às tabelas: usa funções públicas com validação e token específico para cancelamento. Para e-mails e avisos, o padrão Transactional Outbox grava o evento na mesma transação do domínio; workers realizam a entrega depois do commit e registram tentativas. Assim, uma falha do provedor de mensagens não desfaz uma reserva válida.
+
+Esses conceitos conduzem a quatro propriedades observáveis: completude das tarefas, ausência de sobreposição, degradação segura sem cache e custo compatível com a demanda. É sobre essas propriedades --- e não sobre a simples presença das tecnologias --- que o projeto deve ser julgado.
+
+\subsection{Trabalhos relacionados}
+
+Foram selecionados três serviços de agendamento com páginas oficiais consultadas em 25 de outubro de 2026. A Tabela~\ref{tab:comparacao} contrapõe informações comerciais verificáveis ao escopo implementado na Agendinha. A presença de recursos adicionais é característica da oferta, não evidência de pior usabilidade. A comparação também não pressupõe que acesso por navegador signifique implementação como PWA.
+
+\begin{table}[H]
+\centering
+\caption{Comparação de escopo e condições anunciadas por sistemas de agendamento.}
+\label{tab:comparacao}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+% \scalebox{0.9}{
+\begin{tabularx}{\textwidth}{YYYYY}
+\toprule
+\textbf{Critério} & \textbf{Agendinha} & \textbf{Booksy} & \textbf{Trinks} & \textbf{Reservio} \\
+\midrule
+\textbf{Oferta principal} & Agenda essencial para autônomos & Agenda e gestão para beleza e bem-estar & Agenda e gestão de negócios de beleza & Reservas e gestão por níveis de plano \\
+\textbf{Preço divulgado} & Sem preço comercial definido & R\$ 99,99/mês + impostos & R\$ 110/mês (1--2 profissionais, mensal) & Plano Free: R\$ 0; planos pagos com preço variável \\
+\textbf{Limite explícito} & Depende da capacidade testada & Agendamentos ilimitados anunciados & Não identificado na página consultada & Free: 40 reservas por 30 dias \\
+\textbf{Agendamento web} & Página pública compartilhável & Agendamento online 24/7 & Site e app de agendamento & Site de reservas \\
+\textbf{Recursos adicionais anunciados} & Não inclui pagamentos, estoque ou finanças & Marketing, pagamentos e relatórios & Gestão financeira, estoque e pagamentos & Estatísticas, calendário e recursos por plano \\
+\textbf{Instalação PWA} & Prevista na aplicação & Não aferida & Não aferida & Não aferida \\
+\bottomrule
+\end{tabularx}
+% }
+\vspace{2mm}
+\\
+{\footnotesize\raggedright Fonte: elaboração própria, a partir das páginas comerciais oficiais \cite{booksypricing,trinkspricing,reserviopricing}. Consulta em 25 out. 2026. Os valores não incluem condições promocionais nem custos adicionais não informados.\par}
+\end{table}
+
+O Booksy anuncia R\$ 99,99 por mês, mais impostos, e cobrança adicional por membro da equipe. A Trinks anuncia R\$ 110 mensais para um a dois profissionais no ciclo mensal; a opção anual possui preço anunciado distinto. O Reservio permite 40 reservas em 30 dias no nível gratuito, com planos superiores para maior volume \cite{booksypricing,trinkspricing,reserviopricing}. Os valores são retratos das páginas consultadas e não cotações contratadas.
+
+A diferenciação proposta pela Agendinha está na redução deliberada do escopo, no link público, na reserva sem conta para o cliente e na experiência instalável como PWA. Diferentemente dos concorrentes descritos, o projeto não inclui módulos de gestão financeira, estoque ou pagamentos. Não se afirma exclusividade dessas funcionalidades nem superioridade demonstrada: a efetiva vantagem em simplicidade dependerá dos testes com usuários, e a econômica dependerá da apuração dos custos completos de operação.
+
+\todoe{... até aqui... ou seja, o texto acima, mover para o capítulo 2 novo que mencionei anteriormente}
+
+\subsection{Arquitetura e fluxos do sistema}
+
+A aplicação foi organizada em cliente web, serviços de backend e provedores especializados. O navegador entrega a mesma base de código ao prestador autenticado e ao cliente que acessa o link público. As regras de domínio não dependem do estado local da tela: passam pelas Edge Functions, que acessam o PostgreSQL e os serviços auxiliares.
+
+\begin{figure}[H]
+    \centering
+    \resizebox{\textwidth}{!}{\input{figuras/arquitetura}}
+    \caption{Arquitetura implementada da Agendinha.}
+    \label{fig:arquitetura}
+    \fontepropria
+\end{figure}
+
+\subsubsection{Frontend e PWA}
+
+Next.js 16, React 19 e TypeScript compõem a interface. O manifesto permite instalação e o service worker diferencia conteúdos. Navegações e páginas seguem Network-First, preservando atualização e uma resposta de contingência; recursos estáticos elegíveis usam o cache local. Rotas de autenticação não são armazenadas. Web Push entrega avisos ao prestador quando há inscrição e permissão do navegador.
+
+\subsubsection{Autenticação e backend}
+
+Supabase Auth atende o cadastro por e-mail e o login Google. O JWT autentica as funções privadas e participa das políticas de acesso. As Edge Functions calculam disponibilidade, criam e cancelam reservas, aplicam idempotência, versionam cache e inserem mensagens nas outboxes. A interface não recebe credenciais de serviço.
+
+\subsubsection{Dados, cache e comunicações}
+
+O PostgreSQL é a fonte da verdade. O Upstash Redis acelera a leitura de disponibilidade com TTL configurável entre 10 e 900 segundos, sendo 60 segundos o padrão do código. O cache contém dados derivados e pode ser reconstruído; uma exceção na leitura ou gravação não impede a consulta ao banco. O Resend envia confirmações e cancelamentos, enquanto a fila de avisos alimenta Web Push. Os workers precisam ser executados por um agendador confiável em produção.
+
+\subsubsection{Fluxos críticos e tratamento de falhas}
+
+A Figura~\ref{fig:fluxos} reúne os dois fluxos que mais influenciam desempenho e integridade. Eles também esclarecem por que a solução não é tecnicamente Cache-First em todas as camadas: a disponibilidade usa Cache-Aside no backend, enquanto o service worker adota Network-First para navegação.
+
+\begin{figure}[H]
+    \centering
+    \resizebox{\textwidth}{!}{\input{figuras/fluxos-criticos}}
+    \caption{Consulta de disponibilidade e criação de reserva.}
+    \label{fig:fluxos}
+    \fontepropria
+\end{figure}
+
+Na consulta, a chave inclui o prestador, o período consultado e a versão corrente da agenda. Em um hit, o valor validado é devolvido sem acessar o PostgreSQL. Em um miss, a função calcula os slots a partir das regras recorrentes, exceções e reservas confirmadas, grava o resultado com TTL e responde. Se o Redis gerar erro, o mesmo cálculo é feito no banco e a resposta continua correta.
+
+Na reserva, a chave de idempotência é conferida antes da operação e registrada junto ao resultado. A função transacional valida o prestador, converte o horário segundo o fuso, rejeita instantes passados e tenta criar a reserva. A restrição no banco decide conflitos concorrentes. O registro do e-mail é inserido na outbox na mesma transação; após o commit, a versão do cache é avançada. O envio ocorre posteriormente, sem manter a requisição do cliente aberta.
+
+\subsection{Persistência e integridade dos dados}
+
+\todoe{Melhorar a descrição da camada de persistência.}
+
+O modelo implementado separa configuração de disponibilidade, relacionamento com clientes, agendamentos e suporte operacional. A Figura~\ref{fig:der} omite colunas de auditoria e detalhes internos para destacar as relações que explicam o comportamento do produto.
+
+\begin{figure}[H]
+    \centering
+    \resizebox{\textwidth}{!}{\input{figuras/der-simplificado}}
+    \caption{Diagrama entidade-relacionamento simplificado.}
+    \label{fig:der}
+    \fontepropria
+\end{figure}
+
+\todoe{Essa figura não representa um digrama E-R. Um E-R tem um formalismo... usar alguma ferramenta para desenhar as tabelas, chaves PK e FK. Tipos de dados no campos, etc... Não tenha dúvidas que a banca vai considerar essa questão.}
+
+O perfil estende a identidade mantida pelo Supabase Auth e armazena slug e fuso. Um prestador possui grupos de horários; cada grupo reúne regras recorrentes por dia da semana. Exceções representam bloqueios ou disponibilidade extra. Clientes são entidades reutilizáveis e o vínculo \texttt{ProviderClient} mantém a relação específica com o prestador. \texttt{Appointment} referencia prestador e cliente e registra o intervalo, o estado e o token de cancelamento.
+
+As garantias centrais são:
+
+\begin{itemize}
+    \item chaves estrangeiras impedem referências a perfis, clientes ou grupos inexistentes;
+    \item o estado do agendamento é restrito a \texttt{CONFIRMED} ou \texttt{CANCELLED}; cancelar atualiza o estado e preserva a evidência histórica;
+    \item uma restrição de exclusão sobre prestador e intervalo temporal bloqueia sobreposições somente entre reservas confirmadas;
+    \item políticas RLS limitam consultas e alterações do painel às linhas do prestador autenticado;
+    \item funções transacionais mantêm reserva, vínculo com cliente, idempotência e outbox coerentes diante de falhas.
+\end{itemize}
+
+\texttt{IdempotencyRecord} registra chaves, estado e resposta para repetição segura. \texttt{EmailOutbox} e \texttt{NoticeOutbox} armazenam mensagens pendentes, tentativas e falhas; \texttt{PushSubscription} mantém inscrições do navegador. Redis não aparece no DER porque não é persistência oficial: seu conteúdo pode expirar ou ser descartado sem perda de negócio.
+
+\subsection{Tecnologias e viabilidade econômica}
+
+\todoe{Nesta seção serão apresentadas as tecnologias utilizadas... versões etc... Vc precisa informar a versão de cada lib usada no projeto.}
+
+\subsubsection{Tecnologias utilizadas}
+
+\begin{table}[H]
+\centering
+\caption{Tecnologias utilizadas.}
+\label{tab:tecnologias}
+\small
+\begin{tabularx}{\textwidth}{p{2.7cm}p{5cm}Y}
+\toprule
+\textbf{Camada} & \textbf{Tecnologia} & \textbf{Finalidade} \\
+\midrule
+Interface & Next.js, React, TypeScript & Aplicação web e renderização \\
+Estilos & Tailwind CSS, DaisyUI & Interface mobile-first \\
+Backend & Supabase Edge Functions & Regras e contratos HTTP \\
+Dados & PostgreSQL & Fonte oficial, transações e RLS \\
+Autenticação & Supabase Auth & Contas dos prestadores \\
+Cache & Upstash Redis & Disponibilidade derivada \\
+Comunicação & Resend, Web Push & E-mails e avisos \\
+Testes & Vitest, Testing Library & Componentes, hooks e contratos \\
+\bottomrule
+\end{tabularx}
+\fontepropria
+\end{table}
+
+\subsubsection{Viabilidade econômica}
+
+\todoe{Lendo o texto... tem mais análise/avaliação em termos de viabilidade econômica do que da agenda em si. Acho bacana expandir a parte dos fluxos da aplicação, com telas, etc. Tem link de vídeo da aplicação sendo executada? Coloca o vídeo em alguma pasta compartilhada e insere o link no texto.}
+
+A proposta da Agendinha prioriza o acesso à digitalização de agendamentos por profissionais autônomos com recursos financeiros limitados. Para avaliar a viabilidade de uma mensalidade de R\$~5,00 por prestador, considera-se um cenário hipotético com 1.000 prestadores assinantes, cada um realizando 200 agendamentos mensais. Adota-se, por simplificação, um agendamento por cliente no mês. Assim, são projetados 200.000 agendamentos mensais, sem que esse volume represente demanda observada ou capacidade já comprovada por testes de carga.
+
+A receita bruta mensal projetada é de R\$~5.000,00, conforme a Equação~\ref{eq:receita_agendinha}. Não há cobrança por agendamento nem pagamento integrado na versão analisada; logo, não são consideradas receitas de transações.
+
+\begin{equation}
+\label{eq:receita_agendinha}
+\text{Receita mensal} = 1.000\times\text{R\$ }5,00 = \text{R\$ }5.000,00.
+\end{equation}
+
+\paragraph{Tecnologias utilizadas e custos recorrentes.}
+Next.js, React, TypeScript, PostgreSQL, Tailwind CSS e DaisyUI não exigem licenças mensais por prestador na modalidade de uso considerada. As despesas recorrentes concentram-se na execução e hospedagem da aplicação (Vercel), no banco de dados, autenticação e funções de backend (Supabase), no cache de consultas (Upstash Redis) e nas mensagens de confirmação (Resend). O Web Push utiliza recursos dos navegadores, mas sua operação depende dos serviços de backend já contabilizados.
+
+Com base nas tabelas públicas dos provedores, adota-se a Vercel Pro por US\$~20/mês e a Supabase Pro a partir de US\$~25/mês. No Supabase Pro, a franquia publicada de Edge Functions é de 2 milhões de invocações mensais; excedentes podem gerar cobranças adicionais. O Resend Pro custa US\$~20/mês, inclui 50.000 e-mails e anuncia US\$~0,90 por mil e-mails adicionais. O Upstash Redis, no modelo sob demanda, anuncia US\$~0,20 por 100 mil comandos. Os preços e franquias devem ser verificados novamente antes de uma contratação \cite{vercelpricing,supabasepricing,resendpricing,upstashpricing}.
+
+\paragraph{Estimativa de consumo mensal.}
+Para converter agendamentos em despesas, consideram-se as seguintes premissas de planejamento: um e-mail de confirmação por agendamento, dez invocações de Edge Functions e vinte comandos Redis por agendamento. Essas proporções são hipóteses, não medições de produção; acessos que não resultam em reserva, alterações, cancelamentos, reenvios, consultas administrativas e avisos adicionais podem elevar o consumo.
+
+\begin{table}[H]
+\centering
+\caption{Estimativa de demanda e utilização dos serviços em um mês.}
+\label{tab:demanda_1000}
+\small
+\begin{tabularx}{\textwidth}{Y r}
+\toprule
+\textbf{Indicador} & \textbf{Quantidade mensal} \\
+\midrule
+Prestadores assinantes & 1.000 \\
+Agendamentos por prestador & 200 \\
+Agendamentos totais & 200.000 \\
+E-mails transacionais (1 por agendamento) & 200.000 \\
+Invocações de Edge Functions (10 por agendamento) & 2.000.000 \\
+Comandos Redis (20 por agendamento) & 4.000.000 \\
+\bottomrule
+\end{tabularx}
+\fontepropria
+\end{table}
+
+\paragraph{Projeção das despesas de infraestrutura.}
+A estimativa financeira emprega a taxa de câmbio \emph{hipotética} de US\$~1,00 = R\$~5,00, definida apenas para padronizar os cálculos. No cenário adotado, as 2 milhões de invocações de Edge Functions alcançam, mas não ultrapassam, a franquia divulgada do Supabase Pro. Para o Resend, consideram-se 50 mil e-mails incluídos e 150 mil excedentes, resultando em US\$~155,00 mensais. Para o Upstash Redis, 4 milhões de comandos no plano pago resultam em US\$~8,00; não se deduz a franquia gratuita após a migração para o plano sob demanda. A Tabela~\ref{tab:despesas_1000} apresenta a composição dos custos.
+
+\begin{table}[H]
+\centering
+\caption{Projeção mensal de receita e despesas tecnológicas da Agendinha.}
+\label{tab:despesas_1000}
+\small
+\begin{tabularx}{\textwidth}{Y r r}
+\toprule
+\textbf{Item} & \textbf{US\$/mês} & \textbf{R\$/mês} \\
+\midrule
+Vercel Pro (hospedagem) & 20,00 & 100,00 \\
+Supabase Pro (banco, autenticação e funções) & 25,00 & 125,00 \\
+Resend Pro (50 mil e-mails + 150 mil excedentes) & 155,00 & 775,00 \\
+Upstash Redis (4 milhões de comandos) & 8,00 & 40,00 \\
+\midrule
+\textbf{Total estimado de infraestrutura} & \textbf{208,00} & \textbf{1.040,00} \\
+\textbf{Receita bruta com assinaturas} & --- & \textbf{5.000,00} \\
+\textbf{Saldo antes de outras despesas} & --- & \textbf{3.960,00} \\
+\bottomrule
+\end{tabularx}
+\vspace{1mm}
+{\footnotesize\raggedright Fonte: elaboração própria, mediante simulação de consumo e preços anunciados pelos provedores \cite{vercelpricing,supabasepricing,resendpricing,upstashpricing}. Conversão meramente hipotética de R\$~5,00/US\$.\par}
+\end{table}
+
+Dessa forma, os serviços tecnológicos considerados representariam cerca de 20,8\% da receita bruta mensal, ou R\$~1,04 por prestador, restando R\$~3,96 por assinatura antes das demais despesas. Considerando exclusivamente a infraestrutura estimada e supondo o mesmo custo mensal mesmo com menos assinantes, seriam necessárias 208 assinaturas de R\$~5,00 para cobrir R\$~1.040,00. Esse ponto de equilíbrio é apenas ilustrativo: uma redução no número de assinantes também pode alterar o consumo e os custos variáveis.
+
+\paragraph{Limitações da projeção.}
+A estimativa não constitui demonstração de lucro líquido. Não foram incluídos tributos, taxas de recebimento das mensalidades, renovação de domínio, suporte aos prestadores, manutenção, desenvolvimento, backups adicionais, monitoramento, eventuais excedentes de hospedagem, banco de dados e transferência, nem oscilações cambiais. Tampouco foi comprovado, por teste de carga, que os recursos contratados suportam 200.000 reservas mensais nas condições simuladas. Além disso, a hipótese de 200 e-mails por prestador não contabiliza confirmações, cancelamentos e outras mensagens adicionais. Portanto, os valores representam um cenário de referência, sujeito à medição do consumo real e à apuração dos custos operacionais completos.
+
+Ainda assim, a simulação indica que, \emph{sob as premissas estabelecidas}, uma assinatura mensal de R\$~5,00 pode gerar receita suficiente para superar as despesas diretas de infraestrutura consideradas. Essa possibilidade está alinhada à proposta da Agendinha de oferecer agendamento digital simples a profissionais de baixa renda, mas sua sustentabilidade comercial dependerá da confirmação das premissas de demanda, consumo e custos totais de operação.
+
+\subsection{Análise de desempenho e capacidade operacional}
+\label{sec:avaliacao}
+
+
+\todoe{Vc implantou a Agendinha e mediu os indicadores? Se sim, falta apresentar os resultados... senão foi possível, poderias pensar em avaliar a aplicaçào de forma exploratória, na qual um profissional da área cobriu todos os fluxos... ou um grupo de profissionais (de outra área) fez uma avaliação exploratória.}
+
+Desempenho é tratado aqui por sua relação com a experiência de agendamento e com o custo de operação. O código implementa cache para consultas de disponibilidade, mas a presença de Redis não demonstra, isoladamente, menor latência ou capacidade de atender determinada carga. Não foram disponibilizados registros de telemetria de produção que sustentem números observados de tempo de resposta, taxa de erro ou requisições por segundo. Por isso, esta seção distingue o comportamento projetado de resultados medidos.
+
+\begin{table}[H]
+\centering
+\caption{Indicadores operacionais e sua interpretação no sistema.}
+\label{tab:desempenho}
+\small
+\begin{tabularx}{\textwidth}{p{3.1cm}Yp{3.7cm}}
+\toprule
+\textbf{Indicador} & \textbf{Relevância no agendamento} & \textbf{Situação da evidência} \\
+\midrule
+Latência p95 de disponibilidade & Mostra o tempo abaixo do qual são concluídas 95\% das consultas, incluindo cache hit e miss & Não medida em ambiente real \\
+Taxa de erro de reservas & Diferencia falhas técnicas de conflitos de horário legitimamente rejeitados & Sem série de produção \\
+Conflitos de concorrência & A restrição de exclusão no PostgreSQL protege contra reservas confirmadas sobrepostas & Garantia de modelagem; sem medição de carga \\
+Efetividade do cache & Razão entre acertos de cache e leituras, associada à redução de consultas repetidas & Implementação documentada; taxa não aferida \\
+Consumo por agendamento & Contagem de invocações, comandos Redis, e-mails e armazenamento por reserva & Estimado por cenários; requer telemetria \\
+\bottomrule
+\end{tabularx}
+\vspace{1mm}
+{\footnotesize\raggedright Fonte: elaboração própria, com base na arquitetura desenvolvida.\par}
+\end{table}
+
+As métricas de experiência Web devem ser interpretadas conforme definições e metodologias documentadas pelo Google \cite{lighthouse}. Para a Agendinha, a métrica de negócio prioritária é a confirmação correta da reserva, e não uma pontuação isolada de ferramenta sintética. Uma consulta rápida que retorne horário desatualizado é inadequada; por esse motivo, a confirmação volta a consultar o banco de dados em uma transação.
+
+É possível estimar a pressão na infraestrutura a partir da quantidade de prestadores, reservas por prestador e requisições por reserva, mas essa projeção não equivale a benchmark. A próxima avaliação operacional deve registrar a mesma janela de tempo para invocações de Edge Functions, consultas ao banco, comandos Redis, mensagens enviadas e taxa de erros. Sem esses dados, não se afirma desempenho superior ao de soluções comerciais.

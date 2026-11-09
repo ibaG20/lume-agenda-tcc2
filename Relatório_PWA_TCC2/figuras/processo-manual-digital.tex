@@ -1,0 +1,29 @@
+\begin{tikzpicture}[
+    font=\small,
+    node distance=5mm,
+    blocoManual/.style={draw=black!45,fill=black!6,rounded corners,minimum width=5.3cm,minimum height=1.15cm,align=center},
+    blocoDigital/.style={draw=LumeVerde!70,fill=LumeMenta,rounded corners,minimum width=5.3cm,minimum height=1.15cm,align=center},
+    setaManual/.style={-{Stealth[length=2mm]},black!75,thick},
+    setaDigital/.style={-{Stealth[length=2mm]},LumeVerde,thick}
+]
+\node[font=\bfseries] (hm) at (0,0) {PROCESSO MANUAL};
+\node[font=\bfseries] (hd) at (7,0) {PROCESSO DIGITAL PROPOSTO};
+
+\node[blocoManual,below=5mm of hm] (m1) {\textbf{Pedido em mensagem}\\cliente pergunta horários};
+\node[blocoManual,below=of m1] (m2) {\textbf{Consulta ao caderno}\\prestador verifica manualmente};
+\node[blocoManual,below=of m2] (m3) {\textbf{Anotação}\\risco de conflito ou perda};
+\node[blocoManual,below=of m3] (m4) {\textbf{Confirmação manual}\\nova troca de mensagens};
+
+\node[blocoDigital,below=5mm of hd] (d1) {\textbf{Link público}\\sem cadastro do cliente};
+\node[blocoDigital,below=of d1] (d2) {\textbf{Horários disponíveis}\\cálculo automático};
+\node[blocoDigital,below=of d2] (d3) {\textbf{Reserva transacional}\\sem sobreposição};
+\node[blocoDigital,below=of d3] (d4) {\textbf{Confirmação automática}\\e-mail e histórico};
+
+\draw[setaManual] (m1) -- (m2);
+\draw[setaManual] (m2) -- (m3);
+\draw[setaManual] (m3) -- (m4);
+\draw[setaDigital] (d1) -- (d2);
+\draw[setaDigital] (d2) -- (d3);
+\draw[setaDigital] (d3) -- (d4);
+\draw[dashed,gray!60] (3.5,-0.3) -- (3.5,-7.1);
+\end{tikzpicture}

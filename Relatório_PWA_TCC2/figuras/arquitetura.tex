@@ -1,0 +1,28 @@
+\begin{tikzpicture}[
+    font=\scriptsize,
+    caixa/.style={draw=LumeAzul,fill=LumeClaro,rounded corners,minimum width=2.55cm,minimum height=1.35cm,align=center},
+    servico/.style={draw=LumeVerde,fill=LumeMenta,rounded corners,minimum width=2.75cm,minimum height=1.35cm,align=center},
+    dado/.style={draw=black!65!black,fill=black!8,rounded corners,minimum width=2.75cm,minimum height=1.35cm,align=center},
+    seta/.style={-{Stealth[length=2mm]},LumeAzul,thick}
+]
+\node[caixa] (prestador) at (0,2.2) {\textbf{Prestador}\\painel autenticado};
+\node[servico] (cliente) at (0,-0.2) {\textbf{Cliente}\\link público};
+\node[caixa] (pwa) at (4,1) {\textbf{Next.js / PWA}\\React + TypeScript\\service worker};
+\node[caixa] (auth) at (8,3) {\textbf{Supabase Auth}\\login + JWT};
+\node[servico] (edge) at (8,1) {\textbf{Edge Functions}\\regras de negócio};
+\node[dado] (postgres) at (8,-1) {\textbf{PostgreSQL}\\fonte oficial + RLS};
+\node[caixa] (blackis) at (12,3) {\textbf{Upstash Redis}\\cache temporário};
+\node[servico] (resend) at (12,1) {\textbf{Resend}\\e-mail};
+\node[dado] (push) at (12,-1) {\textbf{Web Push}\\avisos};
+
+\draw[seta] (prestador) -- (pwa);
+\draw[seta] (cliente) -- (pwa);
+\draw[seta] (pwa) -- node[above,sloped]{autentica} (auth);
+\draw[seta] (pwa) -- node[above]{HTTPS} (edge);
+\draw[seta] (edge) -- node[right]{SQL} (postgres);
+\draw[seta] (edge) -- node[above,sloped]{cache} (blackis);
+\draw[seta] (edge) -- node[above]{outbox} (resend);
+\draw[seta] (edge) -- node[above,sloped]{avisos} (push);
+
+\node[align=center,font=\scriptsize] at (6,-2.25) {Páginas: Network-First; recursos estáticos: cache local.\\Falha do Redis: consulta direta ao PostgreSQL.};
+\end{tikzpicture}

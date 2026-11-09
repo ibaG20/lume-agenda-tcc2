@@ -1,0 +1,173 @@
+\documentclass[12pt,a4paper]{article}
+
+% ---------------------------------------------------------------
+% Configuração geral - compatível com pdfLaTeX no Overleaf
+% ---------------------------------------------------------------
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage{times} % Fonte serifada Times, conforme artigo-modelo
+\usepackage{microtype}
+\usepackage{geometry}
+\geometry{top=3cm,bottom=2cm,left=3cm,right=2cm}
+\usepackage{setspace}
+\setstretch{1.03} % Ajuste controlado para manter o relatório próximo de 20 páginas
+\usepackage{ragged2e}
+\justifying
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{longtable}
+\usepackage{multirow}
+\usepackage[table]{xcolor}
+\usepackage{enumitem}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,shapes.geometric,fit,calc}
+\usepackage{float}
+\usepackage{caption}
+\captionsetup{font=small,labelfont=bf,justification=centering}
+\usepackage{url}
+\usepackage[hidelinks]{hyperref} % URLs/citações sem coloração ou bordas
+\usepackage[alf]{abntex2cite}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+
+\usepackage{xcolor}
+\newcommand\todoe[1]{\textcolor{red}{evandro:#1}}
+
+% Paleta estritamente monocromática: texto preto, figuras em escala de cinza.
+% Mantidos os nomes de cores anteriores para compatibilidade com as figuras TikZ.
+\definecolor{LumeAzul}{gray}{0.15}
+\definecolor{LumeMarinho}{gray}{0.0}
+\definecolor{LumeVerde}{gray}{0.35}
+\definecolor{LumeClaro}{gray}{0.95}
+\definecolor{LumeMenta}{gray}{0.90}
+\definecolor{LumeCinza}{gray}{0.96}
+
+\titleformat{\section}{\normalfont\bfseries\Large}{\thesection}{0.6em}{}
+\titleformat{\subsection}{\normalfont\bfseries\large}{\thesubsection}{0.6em}{}
+\titleformat{\subsubsection}{\normalfont\bfseries\normalsize}{\thesubsubsection}{0.6em}{}
+\setlength{\parindent}{1.25cm}
+\setlength{\parskip}{0.10em}
+\setlist[itemize]{leftmargin=1.1cm,itemsep=0.15em,topsep=0.25em}
+\setcounter{secnumdepth}{3}
+\setcounter{tocdepth}{2}
+\renewcommand{\contentsname}{SUMÁRIO}
+\renewcommand{\refname}{REFERÊNCIAS}
+
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0.2pt}
+\fancyfoot[L]{\footnotesize Agendinha -- Relatório de Projeto de Software}
+\fancyfoot[R]{\footnotesize\thepage}
+
+\newcommand{\autor}{Gabriella Marreto Rodrigues}
+\newcommand{\titulo}{Desenvolvimento e avaliação de um PWA simples e de baixo custo para digitalização de agendamentos de microempreendedores}
+\newcommand{\tituloingles}{Development and evaluation of a simple, low-cost PWA for digitizing appointments for microentrepreneurs}
+\newcommand{\instituicao}{Universidade Tecnológica Federal do Paraná}
+\newcommand{\curso}{Engenharia de Software}
+\newcommand{\orientador}{Prof. Dr. Evandro Kuszera}
+\newcommand{\cidade}{Dois Vizinhos}
+\newcommand{\ano}{2026}
+
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\newcommand{\fontepropria}{Fonte: autoria própria (2026).}
+
+\begin{document}
+\sloppy
+
+% ---------------------------------------------------------------
+% Capa
+% ---------------------------------------------------------------
+\begin{titlepage}
+    \centering
+    {\large\MakeUppercase{\instituicao}\par}
+    {\large CURSO DE \MakeUppercase{\curso}\par}
+    \vspace{3.2cm}
+    {\large\MakeUppercase{\autor}\par}
+    \vfill
+    {\bfseries\Large\MakeUppercase{\titulo}\par}
+    \vfill
+    {\large\MakeUppercase{\cidade}\par}
+    {\large\ano\par}
+\end{titlepage}
+
+% ---------------------------------------------------------------
+% Folha de rosto
+% ---------------------------------------------------------------
+\begin{titlepage}
+    \centering
+    {\large\MakeUppercase{\autor}\par}
+    \vspace{3cm}
+    {\bfseries\Large\MakeUppercase{\titulo}\par}
+    \vspace{0.5cm}
+    {\itshape\tituloingles\par}
+    \vspace{2.5cm}
+    \begin{flushright}
+        \begin{minipage}{0.52\textwidth}
+        Trabalho de Conclusão de Curso de Graduação apresentado como requisito parcial para obtenção do título de Bacharel em Engenharia de Software pela Universidade Tecnológica Federal do Paraná (UTFPR).
+
+        \vspace{0.5cm}
+        \textbf{Orientador:} \orientador.
+        \end{minipage}
+    \end{flushright}
+    \vfill
+    {\large\MakeUppercase{\cidade}\par}
+    {\large\ano\par}
+\end{titlepage}
+
+% ---------------------------------------------------------------
+% Folha de aprovação - preencher antes da entrega
+% ---------------------------------------------------------------
+\begin{titlepage}
+    \centering
+    {\large\MakeUppercase{\autor}\par}
+    \vspace{1.5cm}
+    {\bfseries\large\MakeUppercase{\titulo}\par}
+    \vspace{1cm}
+    Trabalho de Conclusão de Curso de Graduação apresentado como requisito parcial para obtenção do título de Bacharel em Engenharia de Software.
+
+    \vspace{0.8cm}
+    Aprovado em: \underline{\hspace{1cm}} de \underline{\hspace{3cm}} de 2026.
+
+    \vspace{1cm}
+    \textbf{BANCA EXAMINADORA}
+
+    \vspace{1.2cm}
+    \rule{10cm}{0.4pt}\\
+    \orientador{} -- Orientador\\
+    Universidade Tecnológica Federal do Paraná
+
+    \vspace{1.2cm}
+    \rule{10cm}{0.4pt}\\
+    Prof.(a) Dr.(a) \underline{\hspace{5cm}}\\
+    Universidade Tecnológica Federal do Paraná
+
+    \vspace{1.2cm}
+    \rule{10cm}{0.4pt}\\
+    Prof.(a) Dr.(a) \underline{\hspace{5cm}}\\
+    Universidade Tecnológica Federal do Paraná
+\end{titlepage}
+
+\pagenumbering{roman}
+\setcounter{page}{4}
+
+\tableofcontents
+\newpage
+
+\pagenumbering{arabic}
+\setcounter{page}{1}
+
+\input{capitulos/introducao}
+\input{capitulos/desenvolvimento}
+\input{capitulos/consideracoes}
+
+\newpage
+% Referências autor-data segundo abnTeX2, geradas do arquivo referencias.bib.
+% O estilo do exemplo utiliza referências manuais; a automação evita inconsistências.
+\bibliographystyle{abntex2-alf}
+\bibliography{referencias}
+
+\end{document}

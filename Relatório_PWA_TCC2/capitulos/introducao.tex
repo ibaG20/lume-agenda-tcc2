@@ -1,0 +1,76 @@
+\section{INTRODUÇÃO}
+
+\subsection{Contextualização e justificativa}
+
+O acesso a ferramentas digitais de agendamento não deve depender da capacidade de contratar sistemas complexos ou de manter uma despesa mensal elevada. A Agendinha foi concebida para profissionais autônomos e microempreendedores de renda limitada que atendem com horário marcado, como barbeiros, manicures e prestadores de cuidados pessoais. A proposta consiste em oferecer uma forma direta de disponibilizar a agenda e receber reservas pela internet, sem exigir que o cliente instale aplicativos ou crie uma conta. O valor pretendido é tornar a digitalização viável inclusive para quem administra o negócio sozinho e dispõe de pouco tempo e recursos financeiros.
+
+A gestão de agendamentos representa um desafio operacional para profissionais autônomos e pequenos prestadores de serviços, especialmente quando realizada por meio de registros manuais ou aplicativos de mensagens. Nesse contexto, a definição de horários depende de interações sucessivas entre clientes e prestadores, exigindo consultas frequentes à disponibilidade e atualizações individuais da agenda. Esse processo pode aumentar o esforço administrativo, dificultar a organização dos compromissos e gerar atrasos na confirmação dos atendimentos. Diante desse cenário, identifica-se a oportunidade de desenvolver uma solução digital acessível que centralize a disponibilidade de horários e permita aos próprios clientes realizar seus agendamentos de forma autônoma, reduzindo a necessidade de intermediação manual e simplificando a rotina dos profissionais.
+
+A aplicação procura eliminar a negociação repetitiva sem eliminar a proximidade do atendimento. O prestador cadastra os períodos em que pode trabalhar e compartilha um endereço web, inclusive por aplicativos de mensagens que já utiliza. Ao acessar esse link, o cliente visualiza os horários disponíveis, escolhe por conta própria a opção conveniente e efetua a reserva sem cadastro prévio e sem download. O propósito de experiência é que essa interação seja tão simples quanto conversar pelo celular, idealmente com menos etapas.
+
+A dimensão social e econômica dessa escolha encontra respaldo na relevância do microempreendedorismo de serviços. O IBGE contabilizou 14,6 milhões de microempreendedores individuais (MEIs) no Brasil em 2022; 51,5\% atuavam em serviços e cerca de 1,3 milhão exerciam atividades de cabeleireiro e outros tratamentos de beleza \cite{ibgemei}. O mesmo levantamento identificou aproximadamente 4,1 milhões de MEIs inscritos no Cadastro Único (28,4\% do total), evidenciando a presença de uma parcela economicamente vulnerável entre os empreendedores formalizados \cite{ibgemei}. A inscrição no Cadastro Único não caracteriza automaticamente a renda de cada potencial usuário da Agendinha, mas sustenta a importância de analisar soluções cujos custos fixos não comprometam a sustentabilidade de negócios pequenos.
+
+O mercado já possui plataformas de agendamento. Muitas delas integradas a ferramentas administrativas mais amplas. O Booksy anuncia assinatura de R\$ 99,99 mensais, acrescida de impostos, com recursos de marketing, pagamento e relatórios \cite{booksypricing}. A Trinks divulga mensalidade de R\$ 110 no ciclo mensal para estabelecimentos com um ou dois profissionais \cite{trinkspricing}. O Reservio disponibiliza plano gratuito com limite de até 40 agendamentos a cada 30 dias e oferece planos pagos com capacidades superiores \cite{reserviopricing}. Tais serviços atendem necessidades legítimas, mas permitem evidenciar a diferença de escopo pretendida: a Agendinha não busca reproduzir um sistema completo de administração comercial, e sim disponibilizar o núcleo essencial da agenda digital com a menor barreira possível de acesso.
+
+Dessa forma, a proposta de valor articula três compromissos: \textbf{simplicidade para o cliente}, que não precisa criar conta nem instalar aplicativo; \textbf{autonomia para o prestador}, que publica os horários disponíveis e reduz a necessidade de negociações manuais; e \textbf{acessibilidade econômica}, por meio de infraestrutura gerenciada e compartilhada, com preocupação explícita com o custo mensal por profissional. O estudo de viabilidade apresentado adiante estima cenários de infraestrutura, mas não comprova ainda uma mensalidade final, uma economia efetiva de tempo ou uma superioridade de usabilidade. Esses aspectos dependerão de dados operacionais e da avaliação com o público-alvo. A Tabela~\ref{tab:comparacao} compara características e preços anunciados pelas soluções consultadas em 25 de outubro de 2026.
+
+\begin{figure}[H]
+    \centering
+    \resizebox{0.95\textwidth}{!}{\input{figuras/processo-manual-digital}}
+    \caption{Comparação entre o processo manual e o fluxo digital proposto.}
+    \label{fig:processo}
+    \fontepropria
+\end{figure}
+
+\subsection{Problema}
+
+\begin{quote}
+\textit{Como permitir que prestadores de serviços de renda limitada digitalizem seus agendamentos com baixo custo mensal e uma experiência tão simples quanto a troca habitual de mensagens, sem exigir cadastro ou instalação por parte do cliente?}
+\end{quote}
+
+A questão orienta o produto e os critérios de avaliação. A solução deve permitir que o cliente escolha autonomamente entre horários disponíveis, enquanto o prestador evita consultas e respostas repetitivas. A simplicidade percebida e a economia real deverão ser verificadas com usuários e dados de operação.
+
+\subsection{Objetivos}
+
+\subsubsection{Objetivo geral}
+
+Desenvolver uma aplicação web de agendamentos simples e economicamente acessível para prestadores de serviços de baixa renda, permitindo que clientes consultem a disponibilidade e reservem horários sem cadastro ou instalação, com avaliação de sua adequação ao público-alvo em etapa posterior.
+
+\subsubsection{Objetivos específicos}
+
+\begin{itemize}
+    \item permitir que o prestador configure seus horários de atendimento com poucos passos e compartilhe um endereço público;
+    \item oferecer ao cliente visualização intuitiva da disponibilidade e reserva sem criação de conta ou instalação de aplicativo;
+    \item impedir sobreposição de reservas confirmadas, inclusive diante de solicitações concorrentes;
+    \item automatizar confirmações, cancelamentos e avisos sem prolongar a resposta da operação principal;
+    \item oferecer instalação como PWA e priorizar a experiência em telas móveis;
+    \item estimar e buscar reduzir o custo mensal por prestador com infraestrutura gerenciada e compartilhada, preservando a acessibilidade econômica;
+    \item documentar critérios para avaliação futura da facilidade de uso com pessoas do público-alvo, sem presumir resultados ainda não coletados.
+\end{itemize}
+
+\subsection{Descrição das regras de negócio e escopo}
+
+O escopo foi conferido contra o esquema SQL e os contratos atuais do backend. A descrição a seguir considera o comportamento implementado na versão documentada.
+
+\begin{table}[H]
+\centering
+\caption{Regras de negócio centrais.}
+\label{tab:regras}
+\small
+\begin{tabularx}{\textwidth}{p{3.2cm}Y}
+\toprule
+\textbf{Regra} & \textbf{Comportamento implementado} \\
+\midrule
+Identidade pública & Cada prestador possui perfil, fuso horário e slug único que compõe seu link. \\
+Disponibilidade & Grupos ativos definem regras semanais; exceções acrescentam ou bloqueiam intervalos; reservas e horários passados são removidos do resultado. \\
+Reserva & O cliente informa nome, e-mail e telefone sem criar conta. A gravação usa transação, idempotência e restrição contra sobreposição. \\
+Cancelamento & O prestador autenticado ou o cliente portador de token válido pode cancelar. O registro passa a \texttt{CANCELLED} e permanece no histórico. \\
+Cache & Alterações relevantes avançam a versão da agenda. O Redis guarda apenas resultados temporários e sua falha leva à consulta ao PostgreSQL. \\
+Comunicação & E-mails e avisos são persistidos em outboxes e processados por workers, permitindo repetição controlada. \\
+\bottomrule
+\end{tabularx}
+\fontepropria
+\end{table}
+
+Ficam fora do produto mínimo: pagamentos, gestão financeira, estoque, marketplace, duração variável por serviço, relatórios analíticos e reagendamento. Essa contenção é deliberada: a proposta não é reproduzir uma suíte administrativa, mas digitalizar o núcleo da agenda em papel.
+

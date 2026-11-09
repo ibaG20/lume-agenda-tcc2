@@ -1,0 +1,33 @@
+\section{CONSIDERAÇÕES FINAIS}
+
+\subsection{Síntese e atendimento aos objetivos}
+
+Este trabalho apresenta o desenvolvimento da Lume Agendas \todoe{?????????????} , concebida para tornar o agendamento digital simples e economicamente acessível a prestadores de serviços de renda limitada. A proposta é substituir a negociação repetitiva de horários por mensagens e a consulta manual de compromissos por um link público de disponibilidade, preservando a autonomia do cliente e evitando cadastro ou instalação de aplicativo. Na versão documentada, o prestador pode configurar sua disponibilidade, compartilhar um link público e acompanhar os agendamentos. O cliente pode selecionar um horário, registrar uma reserva sem criar uma conta e solicitar seu cancelamento por meio de um token específico.
+
+Do ponto de vista da implementação, foram adotados mecanismos de controle de concorrência, políticas de acesso aos dados, processamento assíncrono de notificações e cache de consultas. Esses recursos atendem às decisões arquiteturais estabelecidas, mas sua presença não equivale à comprovação de desempenho ou de facilidade de uso em condições reais. Até a conclusão desta versão do relatório, \textbf{a aplicação não havia sido avaliada por usuários reais}; portanto, não é possível afirmar que o público-alvo tenha confirmado a usabilidade, a aceitação ou os benefícios operacionais esperados.
+
+\paragraph{Resultados da avaliação com usuários reais.} \textit{[A preencher após a realização da avaliação com usuários reais.]} 
+
+\paragraph{Principais dificuldades e percepções dos participantes.} \textit{[A preencher após a coleta e a análise dos resultados.]} 
+
+A análise de viabilidade econômica foi construída com base em preços publicados pelos provedores e cenários hipotéticos de demanda. Ela fornece uma referência para planejamento, sem representar despesas operacionais efetivamente observadas. A definição de uma mensalidade sustentável ainda depende de medições de consumo, suporte, tributos, câmbio e demais custos de operação.
+
+\subsection{Limitações}
+
+\begin{itemize}
+    \item a solução ainda não passou por avaliação com usuários reais, permanecendo pendentes dados de usabilidade, aceitação e adequação ao cotidiano dos prestadores;
+    \item não há resultados de telemetria de produção suficientes para caracterizar tempos de resposta, taxas de erro ou consumo médio por operação;
+    \item o funcionamento depende de serviços externos de hospedagem, autenticação, cache e envio de e-mails, cuja disponibilidade e cobrança podem variar;
+    \item a versão atual é orientada à agenda de um prestador, sem gestão conjunta de vários profissionais no mesmo estabelecimento;
+    \item não há processamento de pagamentos diretamente na plataforma.
+\end{itemize}
+
+\subsection{Trabalhos futuros}
+
+A próxima etapa de validação é realizar avaliações com usuários reais, observando a execução de tarefas representativas, as dificuldades encontradas e a percepção de utilidade. Os dados obtidos deverão preencher os campos pendentes deste relatório e orientar ajustes de interface e do fluxo de agendamento.
+
+No desenvolvimento funcional, duas evoluções são prioritárias. A primeira é permitir que \textbf{mais de um profissional cadastre e administre seus próprios horários em um mesmo estabelecimento}, com agendas independentes, escolha do profissional no fluxo de reserva e prevenção de conflitos de disponibilidade. A segunda é \textbf{possibilitar o pagamento pelo próprio sistema}, mediante integração com um provedor de pagamentos, contemplando confirmação de transações, estados de pagamento, cancelamentos e tratamento seguro das informações financeiras.
+
+Como desdobramentos complementares, podem ser considerados reagendamento, lembretes automáticos, relatórios essenciais, monitoramento operacional e avaliação de desempenho sob diferentes volumes de acesso. A priorização dessas funcionalidades deverá considerar os resultados da validação com usuários e os custos reais de manutenção, preservando a simplicidade que orienta o projeto.
+
+Conclui-se que a versão implementada oferece uma base técnica coerente com a proposta de democratizar o agendamento digital: menor complexidade funcional, reserva autônoma pelo cliente e atenção ao custo mensal de operação. Entretanto, não se afirma ainda que o produto seja mais simples no uso real ou financeiramente acessível em todos os cenários. A confirmação desses benefícios dependerá de avaliações com os prestadores e clientes, além da apuração dos custos efetivos de manutenção.

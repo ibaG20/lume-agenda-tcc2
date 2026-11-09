@@ -1,0 +1,38 @@
+\begin{tikzpicture}[
+    font=\scriptsize,
+    ator/.style={draw=LumeAzul!35,fill=LumeClaro,rounded corners,minimum width=1.6cm,minimum height=0.65cm,align=center},
+    vida/.style={gray!55,dashed},
+    msg/.style={-{Stealth[length=1.8mm]},LumeAzul,thick},
+    msgb/.style={-{Stealth[length=1.8mm]},LumeVerde,thick}
+]
+\node[font=\bfseries] at (2.8,0.5) {A. CONSULTA DE DISPONIBILIDADE};
+\node[ator] (c1) at (0,0) {Cliente};
+\node[ator] (e1) at (2,0) {Edge};
+\node[ator] (r1) at (4,0) {Redis};
+\node[ator] (p1) at (6,0) {Postgres};
+\foreach \x in {0,2,4,6}{\draw[vida] (\x,-0.35) -- (\x,-5.7);}
+\draw[msg] (0,-0.8) -- node[above]{GET slots} (2,-0.8);
+\draw[msg] (2,-1.5) -- node[above]{GET chave} (4,-1.5);
+\draw[msg] (4,-2.2) -- node[above]{hit: dados} (2,-2.2);
+\draw[msg] (2,-3.0) -- node[above]{miss: consulta} (6,-3.0);
+\draw[msg] (6,-3.7) -- node[above]{dados oficiais} (2,-3.7);
+\draw[msg] (2,-4.4) -- node[above]{SET + TTL} (4,-4.4);
+\draw[msg] (2,-5.1) -- node[above]{horários} (0,-5.1);
+
+\draw[gray!50] (7,-0.4) -- (7,-5.7);
+\node[font=\bfseries] at (10.6,0.5) {B. RESERVA E CONFIRMAÇÃO};
+\node[ator] (c2) at (8,0) {Cliente};
+\node[ator] (e2) at (10,0) {Edge};
+\node[ator] (p2) at (12,0) {Postgres};
+\node[ator] (w2) at (14,0) {Workers};
+\foreach \x in {8,10,12,14}{\draw[vida] (\x,-0.35) -- (\x,-5.7);}
+\draw[msgb] (8,-0.8) -- node[above]{POST + chave} (10,-0.8);
+\draw[msgb] (10,-1.6) -- node[above]{RPC transacional} (12,-1.6);
+\node[draw=LumeVerde,minimum width=0.45cm,minimum height=0.45cm] at (12.25,-2.35) {};
+\node[right] at (12.55,-2.35) {valida e bloqueia};
+\node[draw=LumeVerde,minimum width=0.45cm,minimum height=0.45cm] at (12.25,-3.0) {};
+\node[right] at (12.55,-3.0) {agenda + outbox};
+\draw[msgb] (12,-3.7) -- node[above]{commit} (10,-3.7);
+\draw[msgb] (10,-4.4) -- node[above]{confirmação} (8,-4.4);
+\draw[msgb] (14,-5.1) -- node[above]{consome outbox} (12,-5.1);
+\end{tikzpicture}
