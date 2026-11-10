@@ -14,7 +14,7 @@ O mercado já possui plataformas de agendamento. Muitas delas integradas a ferra
 
 Dessa forma, a proposta de valor articula três compromissos: \textbf{simplicidade para o cliente}, que não precisa criar conta nem instalar aplicativo; \textbf{autonomia para o prestador}, que publica os horários disponíveis e reduz a necessidade de negociações manuais; e \textbf{acessibilidade econômica}, por meio de infraestrutura gerenciada e compartilhada, com preocupação explícita com o custo mensal por profissional. O estudo de viabilidade apresentado adiante estima cenários de infraestrutura, mas não comprova ainda uma mensalidade final, uma economia efetiva de tempo ou uma superioridade de usabilidade. Esses aspectos dependerão de dados operacionais e da avaliação com o público-alvo. A Tabela~\ref{tab:comparacao} compara características e preços anunciados pelas soluções consultadas em 25 de outubro de 2026.
 
-\begin{figure}[H]
+\begin{figure}[htbp]
     \centering
     \resizebox{0.95\textwidth}{!}{\input{figuras/processo-manual-digital}}
     \caption{Comparação entre o processo manual e o fluxo digital proposto.}
@@ -52,7 +52,7 @@ Desenvolver uma aplicação web de agendamentos simples e economicamente acessí
 
 O escopo foi conferido contra o esquema SQL e os contratos atuais do backend. A descrição a seguir considera o comportamento implementado na versão documentada.
 
-\begin{table}[H]
+\begin{table}[htbp]
 \centering
 \caption{Regras de negócio centrais.}
 \label{tab:regras}
@@ -73,4 +73,6 @@ Comunicação & E-mails e avisos são persistidos em outboxes e processados por 
 \end{table}
 
 Ficam fora do produto mínimo: pagamentos, gestão financeira, estoque, marketplace, duração variável por serviço, relatórios analíticos e reagendamento. Essa contenção é deliberada: a proposta não é reproduzir uma suíte administrativa, mas digitalizar o núcleo da agenda em papel.
+
+\FloatBarrier
 

@@ -1,0 +1,150 @@
+\begin{tikzpicture}[
+    font=\scriptsize,
+    entidade/.style={draw=black!80,fill=white,inner sep=2pt,align=left,anchor=north west},
+    rel/.style={-{Stealth[length=1.5mm]},black!70,thin},
+    rotulo/.style={fill=white,inner sep=1pt,font=\scriptsize}
+]
+
+\node[entidade] (profiles) at (0,0) {
+\begin{tabular}{@{}lll@{}}
+\rowcolor{black!15}\multicolumn{3}{c}{\textbf{profiles}}\\
+PK/FK & \texttt{id} & uuid\\
+ & \texttt{name} & text\\
+UQ & \texttt{public\_slug} & text\\
+ & \texttt{phone} & text?\\
+ & \texttt{timezone} & text\\
+ & \texttt{updated\_at} & timestamptz
+\end{tabular}};
+
+\node[entidade] (groups) at (6.4,0) {
+\begin{tabular}{@{}lll@{}}
+\rowcolor{black!15}\multicolumn{3}{c}{\textbf{AvailabilityRuleGroup}}\\
+PK & \texttt{id} & uuid\\
+FK & \texttt{provider\_id} & uuid\\
+ & \texttt{name} & text\\
+ & \texttt{is\_active} & boolean
+\end{tabular}};
+
+\node[entidade] (rules) at (13,0) {
+\begin{tabular}{@{}lll@{}}
+\rowcolor{black!15}\multicolumn{3}{c}{\textbf{AvailabilityRule}}\\
+PK & \texttt{id} & uuid\\
+FK & \texttt{group\_id} & uuid\\
+ & \texttt{day\_of\_week} & smallint\\
+ & \texttt{start\_time} & time\\
+ & \texttt{end\_time} & time\\
+ & \texttt{slot\_duration\_minutes} & smallint\\
+ & \texttt{appointment\_count} & smallint
+\end{tabular}};
+
+\node[entidade] (idempotency) at (20.4,0) {
+\begin{tabular}{@{}lll@{}}
+\rowcolor{black!15}\multicolumn{3}{c}{\textbf{idempotency\_record}}\\
+PK & \texttt{operation} & text\\
+PK & \texttt{idempotency\_key} & uuid\\
+ & \texttt{request\_hash} & text\\
+ & \texttt{response} & jsonb\\
+ & \texttt{created\_at} & timestamptz
+\end{tabular}};
+
+\node[entidade] (overrides) at (0,-4.8) {
+\begin{tabular}{@{}lll@{}}
+\rowcolor{black!15}\multicolumn{3}{c}{\textbf{AvailabilityOverride}}\\
+PK & \texttt{id} & uuid\\
+FK & \texttt{provider\_id} & uuid\\
+ & \texttt{start\_datetime} & timestamptz\\
+ & \texttt{end\_datetime} & timestamptz\\
+ & \texttt{is\_available} & boolean
+\end{tabular}};
+
+\node[entidade] (clients) at (6.4,-4.8) {
+\begin{tabular}{@{}lll@{}}
+\rowcolor{black!15}\multicolumn{3}{c}{\textbf{Client}}\\
+PK & \texttt{id} & uuid\\
+ & \texttt{name} & text\\
+UQ & \texttt{email} & text\\
+ & \texttt{phone} & text
+\end{tabular}};
+
+\node[entidade] (providerclients) at (12.3,-4.8) {
+\begin{tabular}{@{}lll@{}}
+\rowcolor{black!15}\multicolumn{3}{c}{\textbf{ProviderClient}}\\
+PK & \texttt{id} & uuid\\
+FK & \texttt{provider\_id} & uuid\\
+FK & \texttt{client\_id} & uuid\\
+ & \texttt{name} & text\\
+UQ & \texttt{email} & text\\
+ & \texttt{phone} & text
+\end{tabular}};
+
+\node[entidade] (appointments) at (19.5,-4.8) {
+\begin{tabular}{@{}lll@{}}
+\rowcolor{black!15}\multicolumn{3}{c}{\textbf{Appointment}}\\
+PK & \texttt{id} & uuid\\
+FK & \texttt{provider\_id} & uuid\\
+FK & \texttt{client\_id} & uuid\\
+ & \texttt{start\_datetime} & timestamptz\\
+ & \texttt{end\_datetime} & timestamptz\\
+ & \texttt{status} & appointment\_status\\
+UQ & \texttt{cancellation\_token} & uuid
+\end{tabular}};
+
+\node[entidade] (push) at (0,-9.8) {
+\begin{tabular}{@{}lll@{}}
+\rowcolor{black!15}\multicolumn{3}{c}{\textbf{push\_subscription}}\\
+PK & \texttt{id} & uuid\\
+FK & \texttt{provider\_id} & uuid\\
+ & \texttt{endpoint} & text\\
+ & \texttt{p256dh} & text\\
+ & \texttt{auth\_key} & text\\
+ & \texttt{created\_at} & timestamptz
+\end{tabular}};
+
+\node[entidade] (notices) at (8,-9.8) {
+\begin{tabular}{@{}lll@{}}
+\rowcolor{black!15}\multicolumn{3}{c}{\textbf{notice\_outbox}}\\
+PK & \texttt{id} & uuid\\
+FK & \texttt{provider\_id} & uuid\\
+ & \texttt{event\_type} & notice\_event\_type\\
+FK & \texttt{appointment\_id} & uuid\\
+ & \texttt{status} & notice\_status\\
+ & \texttt{push\_status} & notice\_push\_status\\
+ & \texttt{push\_attempt\_count} & integer\\
+ & \texttt{push\_available\_at} & timestamptz\\
+ & \texttt{push\_locked\_at} & timestamptz?\\
+ & \texttt{created\_at} & timestamptz\\
+ & \texttt{dismissed\_at} & timestamptz?
+\end{tabular}};
+
+\node[entidade] (emails) at (19,-9.8) {
+\begin{tabular}{@{}lll@{}}
+\rowcolor{black!15}\multicolumn{3}{c}{\textbf{email\_outbox}}\\
+PK & \texttt{id} & uuid\\
+ & \texttt{event\_type} & email\_event\_type\\
+FK & \texttt{appointment\_id} & uuid\\
+ & \texttt{status} & email\_outbox\_status\\
+ & \texttt{attempt\_count} & integer\\
+ & \texttt{available\_at} & timestamptz\\
+ & \texttt{locked\_at} & timestamptz?\\
+ & \texttt{sent\_at} & timestamptz?\\
+ & \texttt{last\_error} & text?\\
+ & \texttt{created\_at} & timestamptz
+\end{tabular}};
+
+\draw[rel] (profiles.east) -- node[rotulo,above]{1:N} (groups.west);
+\draw[rel] (groups.east) -- node[rotulo,above]{1:N} (rules.west);
+\draw[rel] (profiles.south) -- node[rotulo,right]{1:N} (overrides.north);
+\draw[rel] (clients.east) -- node[rotulo,above]{1:N} (providerclients.west);
+\draw[rel] (providerclients.east) -- node[rotulo,above]{1:N, FK composta} (appointments.west);
+\draw[rel] (profiles.south east) to[out=-25,in=150] node[rotulo,above]{1:N} (providerclients.north west);
+\draw[rel] (clients.north east) to[out=30,in=150] node[rotulo,above]{1:N} (appointments.north west);
+\draw[rel] (profiles.north) -- ++(0,1.1) -| node[rotulo,near end,right]{1:N} (appointments.east);
+\draw[rel] (profiles.west) -- ++(-0.8,0) |- node[rotulo,near end,left]{1:N} (push.west);
+\draw[rel] (appointments.south) to[out=-80,in=70] node[rotulo,right]{1:N} (emails.north);
+\draw[rel] (appointments.south west) to[out=-115,in=40] node[rotulo,above]{1:N} (notices.north east);
+\draw[rel] (profiles.west) -- ++(-1.15,0) |- (0,-15.5) -- node[rotulo,near end,below]{1:N} (notices.south);
+
+\node[anchor=west,font=\scriptsize] at (0,-16.2) {Legenda: PK = chave primária; FK = chave estrangeira; UQ = restrição de unicidade; ``?'' = campo opcional.};
+\node[anchor=east,font=\scriptsize] at (27,-16.2) {\texttt{profiles.id} também referencia \texttt{auth.users.id}.};
+
+\end{tikzpicture}

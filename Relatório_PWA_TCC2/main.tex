@@ -5,7 +5,7 @@
 % ---------------------------------------------------------------
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
-\usepackage[brazil]{babel}
+\usepackage[brazilian]{babel}
 \usepackage{times} % Fonte serifada Times, conforme artigo-modelo
 \usepackage{microtype}
 \usepackage{geometry}
@@ -27,14 +27,13 @@
 \usepackage{float}
 \usepackage{caption}
 \captionsetup{font=small,labelfont=bf,justification=centering}
+\usepackage{placeins}
+\usepackage{pdflscape}
 \usepackage{url}
 \usepackage[hidelinks]{hyperref} % URLs/citações sem coloração ou bordas
 \usepackage[alf]{abntex2cite}
 \usepackage{fancyhdr}
 \usepackage{titlesec}
-
-\usepackage{xcolor}
-\newcommand\todoe[1]{\textcolor{red}{evandro:#1}}
 
 % Paleta estritamente monocromática: texto preto, figuras em escala de cinza.
 % Mantidos os nomes de cores anteriores para compatibilidade com as figuras TikZ.
@@ -77,6 +76,7 @@
 
 \begin{document}
 \sloppy
+\hypersetup{pageanchor=false}
 
 % ---------------------------------------------------------------
 % Capa
@@ -151,6 +151,7 @@
     Universidade Tecnológica Federal do Paraná
 \end{titlepage}
 
+\hypersetup{pageanchor=true}
 \pagenumbering{roman}
 \setcounter{page}{4}
 
@@ -161,12 +162,13 @@
 \setcounter{page}{1}
 
 \input{capitulos/introducao}
+\input{capitulos/fundamentacao}
 \input{capitulos/desenvolvimento}
 \input{capitulos/consideracoes}
 
-\newpage
 % Referências autor-data segundo abnTeX2, geradas do arquivo referencias.bib.
 % O estilo do exemplo utiliza referências manuais; a automação evita inconsistências.
+\footnotesize
 \bibliographystyle{abntex2-alf}
 \bibliography{referencias}
 

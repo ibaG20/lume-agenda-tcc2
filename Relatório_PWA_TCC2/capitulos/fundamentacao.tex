@@ -1,0 +1,60 @@
+\section{FUNDAMENTAÇÃO TEÓRICA E TRABALHOS RELACIONADOS}
+
+Este capítulo reúne os conceitos que orientaram as decisões de projeto e compara a Agendinha com serviços de agendamento disponíveis no mercado. A separação entre fundamentação e desenvolvimento permite que o capítulo seguinte se concentre exclusivamente no que foi implementado.
+
+\subsection{Fundamentos técnicos}
+
+\subsubsection{Digitalização enxuta e experiência mobile-first}
+
+Digitalizar um processo não significa apenas converter o caderno em uma tela. O sistema deve retirar etapas manuais, centralizar o estado e tornar o resultado verificável. No caso estudado, o ganho esperado vem da publicação automática da disponibilidade e da validação da reserva, e não da inclusão de módulos administrativos. A abordagem mobile-first parte da menor largura de tela e da interação por toque, coerente com um público que pode ter o celular como principal dispositivo.
+
+\subsubsection{Progressive Web Apps}
+
+Uma Progressive Web App combina tecnologias da Web com recursos de instalação e execução semelhantes aos de aplicativos. Manifesto, HTTPS e service worker permitem adicionar a aplicação à tela inicial e controlar estratégias de rede e cache \cite{mdnpwa,w3cmanifest}. Essa alternativa evita manter projetos nativos separados e reduz a barreira de instalação. Não implica, porém, funcionamento integral sem internet: reservas precisam alcançar o servidor para que a concorrência seja resolvida sobre um estado comum.
+
+\subsubsection{Arquitetura gerenciada e Cache-Aside}
+
+Serviços gerenciados deslocam tarefas de provisionamento, atualização e disponibilidade para provedores especializados. Isso favorece equipes pequenas, embora introduza dependência externa. Na estratégia Cache-Aside, a aplicação consulta o Redis antes da fonte oficial; em caso de ausência, lê o PostgreSQL, grava uma cópia temporária e devolve o resultado \cite{fowler2002}. Uma versão por prestador invalida logicamente as chaves após mudanças. Se o Redis estiver indisponível, a consulta permanece correta, apenas potencialmente mais lenta.
+
+\subsubsection{Transações, concorrência e idempotência}
+
+O horário exibido ao cliente pode ser escolhido por outra pessoa antes da confirmação. Por isso, a verificação decisiva ocorre na transação de reserva. A restrição de exclusão do PostgreSQL impede dois intervalos confirmados sobrepostos para o mesmo prestador \cite{postgresconstraints}. A chave de idempotência associa tentativas repetidas à mesma resposta, evitando duplicação quando o cliente reenvia a requisição por perda de conexão.
+
+\subsubsection{Segurança e comunicação assíncrona}
+
+O Supabase Auth emite JWTs para identificar o prestador, enquanto as políticas de Row Level Security limitam linhas ao respectivo proprietário \cite{supabasetls}. O cliente não recebe acesso amplo às tabelas: usa funções públicas com validação e token específico para cancelamento. Para e-mails e avisos, o padrão Transactional Outbox grava o evento na mesma transação do domínio; workers realizam a entrega depois do commit e registram tentativas. Assim, uma falha do provedor de mensagens não desfaz uma reserva válida.
+
+Esses conceitos conduzem a quatro propriedades observáveis: completude das tarefas, ausência de sobreposição, degradação segura sem cache e custo compatível com a demanda. É sobre essas propriedades, e não sobre a simples presença das tecnologias, que o projeto deve ser analisado.
+
+\subsection{Trabalhos relacionados}
+
+Foram selecionados três serviços de agendamento com páginas oficiais consultadas em 25 de outubro de 2026. A Tabela~\ref{tab:comparacao} contrapõe informações comerciais verificáveis ao escopo implementado na Agendinha. A presença de recursos adicionais é característica da oferta, não evidência de pior usabilidade. A comparação também não pressupõe que acesso por navegador signifique implementação como PWA.
+
+\begin{table}[htbp]
+\centering
+\caption{Comparação de escopo e condições anunciadas por sistemas de agendamento.}
+\label{tab:comparacao}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabularx}{\textwidth}{YYYYY}
+\toprule
+\textbf{Critério} & \textbf{Agendinha} & \textbf{Booksy} & \textbf{Trinks} & \textbf{Reservio} \\
+\midrule
+\textbf{Oferta principal} & Agenda essencial para autônomos & Agenda e gestão para beleza e bem-estar & Agenda e gestão de negócios de beleza & Reservas e gestão por níveis de plano \\
+\textbf{Preço divulgado} & Sem preço comercial definido & R\$ 99,99/mês + impostos & R\$ 110/mês (1--2 profissionais, mensal) & Plano Free: R\$ 0; planos pagos com preço variável \\
+\textbf{Limite explícito} & Depende da capacidade testada & Agendamentos ilimitados anunciados & Não identificado na página consultada & Free: 40 reservas por 30 dias \\
+\textbf{Agendamento web} & Página pública compartilhável & Agendamento online 24/7 & Site e app de agendamento & Site de reservas \\
+\textbf{Recursos adicionais anunciados} & Não inclui pagamentos, estoque ou finanças & Marketing, pagamentos e relatórios & Gestão financeira, estoque e pagamentos & Estatísticas, calendário e recursos por plano \\
+\textbf{Instalação PWA} & Prevista na aplicação & Não aferida & Não aferida & Não aferida \\
+\bottomrule
+\end{tabularx}
+\vspace{2mm}
+
+{\footnotesize\raggedright Fonte: elaboração própria, a partir das páginas comerciais oficiais \cite{booksypricing,trinkspricing,reserviopricing}. Consulta em 25 out. 2026. Os valores não incluem condições promocionais nem custos adicionais não informados.\par}
+\end{table}
+
+O Booksy anuncia R\$ 99,99 por mês, mais impostos, e cobrança adicional por membro da equipe. A Trinks anuncia R\$ 110 mensais para um a dois profissionais no ciclo mensal; a opção anual possui preço anunciado distinto. O Reservio permite 40 reservas em 30 dias no nível gratuito, com planos superiores para maior volume \cite{booksypricing,trinkspricing,reserviopricing}. Os valores são retratos das páginas consultadas e não cotações contratadas.
+
+A diferenciação proposta pela Agendinha está na redução deliberada do escopo, no link público, na reserva sem conta para o cliente e na experiência instalável como PWA. Diferentemente dos concorrentes descritos, o projeto não inclui módulos de gestão financeira, estoque ou pagamentos. Não se afirma exclusividade dessas funcionalidades nem superioridade demonstrada: a efetiva vantagem em simplicidade dependerá da avaliação exploratória, e a econômica dependerá da apuração dos custos completos de operação.
+
+\FloatBarrier
