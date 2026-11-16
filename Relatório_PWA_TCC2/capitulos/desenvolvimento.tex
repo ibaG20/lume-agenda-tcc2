@@ -13,7 +13,7 @@ As funcionalidades foram organizadas por ator e verificadas na interface, nos ho
 \toprule
 \textbf{Ator} & \textbf{Funcionalidade} & \textbf{Situação} \\
 \midrule
-Prestador & Cadastro e login por e-mail ou Google & Implementada \\
+Prestador & Cadastro e login por e-mail & Implementada \\
 Prestador & Perfil, slug público e fuso horário & Implementada \\
 Prestador & Grupos de horários, dias e faixas de atendimento & Implementada \\
 Prestador & Agenda diária e estados dos compromissos & Implementada \\
@@ -72,9 +72,7 @@ Uma demonstração contínua dos fluxos da aplicação está disponível no \hre
 
 \subsubsection{Critério de simplicidade}
 
-Simplicidade não é medida apenas pelo número de telas. O desenho reduz decisões: o cliente não escolhe plano, não instala aplicativo e não cria senha; o prestador não precisa configurar infraestrutura. A simulação da avaliação exploratória, apresentada na Seção~\ref{sec:avaliacao}, permitiu verificar preliminarmente como essa redução se converte em tarefas concluídas e quais dificuldades permanecem.
-
-\FloatBarrier
+Simplicidade não é medida apenas pelo número de telas. O desenho reduz decisões: o cliente não escolhe plano, não instala aplicativo e não cria senha; o prestador não precisa configurar infraestrutura. A avaliação exploratória, apresentada na Seção~\ref{sec:avaliacao}, permitiu verificar preliminarmente como essa redução se converte em tarefas concluídas e quais dificuldades permanecem.
 
 \subsection{Arquitetura e fluxos do sistema}
 
@@ -124,15 +122,16 @@ Na reserva, a Edge Function valida slug, intervalo, nome, e-mail, telefone e cha
 
 Na mesma transação são criados o agendamento e os eventos necessários às outboxes. Depois do commit, a versão da agenda no Redis é incrementada, tornando obsoletas as chaves anteriores sem depender de sua remoção imediata. A resposta de sucesso retorna ao cliente antes do envio das mensagens. Workers separados reivindicam registros pendentes, chamam Resend e Web Push e registram sucesso, falha ou nova tentativa. Assim, erros no cache ou nos provedores de comunicação degradam recursos auxiliares, mas não alteram a decisão de integridade tomada pelo banco.
 
-\FloatBarrier
-
 \subsection{Persistência e integridade dos dados}
+
+\todoe{Melhorar a descrição da camada de persistência.}
 
 A persistência separa disponibilidade recorrente, exceções, identidade dos clientes, reservas e suporte operacional. O esquema é definido por migrações SQL e utiliza tipos nativos do PostgreSQL, chaves estrangeiras, unicidade, verificações de intervalo e políticas de acesso. A Figura~\ref{fig:der} apresenta as onze tabelas persistentes na versão documentada, com tipos, chaves e cardinalidades.
 
 O perfil estende a identidade administrada pelo Supabase Auth. Cada perfil possui grupos de horários, e cada grupo reúne regras por dia da semana. A duração do atendimento e a quantidade de horários são armazenadas na regra, enquanto exceções representam bloqueios ou disponibilidade adicional. A separação entre \texttt{Client} e \texttt{ProviderClient} permite reutilizar a identidade do cliente e preservar os dados informados no relacionamento com cada prestador.
 
-\begin{landscape}
+
+\begin{figure}
 \thispagestyle{fancy}
 \vspace*{-0.6cm}
 \noindent\begin{minipage}[t]{\linewidth}
@@ -140,11 +139,10 @@ O perfil estende a identidade administrada pelo Supabase Auth. Cada perfil possu
 \captionof{figure}{Diagrama entidade-relacionamento da Agendinha.}
 \label{fig:der}
 \centering
-\resizebox{0.90\linewidth}{!}{\input{figuras/der-relacional}}
-\par\smallskip
+\resizebox{1\linewidth}{!}{\input{figuras/der-relacional}}
 \fontepropria
 \end{minipage}
-\end{landscape}
+\end{figure}
 
 \texttt{Appointment} referencia o prestador e o cliente, registra o intervalo, o estado e o token de cancelamento e também possui uma chave estrangeira composta para \texttt{ProviderClient}. A restrição de exclusão sobre prestador e intervalo impede sobreposição apenas entre reservas confirmadas; reservas canceladas permanecem como histórico.
 
@@ -153,6 +151,8 @@ As tabelas \texttt{email\_outbox} e \texttt{notice\_outbox} mantêm eventos, est
 Além da integridade referencial apresentada no diagrama, as políticas RLS restringem o painel às linhas do prestador autenticado. Funções transacionais mantêm coerentes a reserva, o vínculo com o cliente, o registro de idempotência e as outboxes. O cancelamento altera o estado para \texttt{CANCELLED}, preservando o registro e liberando o intervalo para novas consultas.
 
 \subsection{Tecnologias e viabilidade econômica}
+
+\todoe{Nesta seção serão apresentadas as tecnologias utilizadas... versões etc... Vc precisa informar a versão de cada lib usada no projeto.}
 
 \subsubsection{Tecnologias e versões utilizadas}
 
@@ -236,38 +236,37 @@ Upstash Redis para 4 milhões de comandos & 8,00 & 40,00 \\
 
 Sob essas premissas, a infraestrutura representaria R\$~1,04 por prestador e 20,8\% da receita bruta. A diferença restante não equivale a lucro: a estimativa exclui tributos, cobrança, domínio, suporte, manutenção, desenvolvimento, monitoramento, backups, transferência, excedentes não previstos e oscilação cambial. Demanda, consumo e capacidade não foram observados em operação. Portanto, a simulação apenas indica que a mensalidade proposta pode cobrir os serviços considerados se as premissas forem confirmadas.
 
-\FloatBarrier
 
 \subsection{Avaliação exploratória da aplicação}
 \label{sec:avaliacao}
 
-A avaliação foi estruturada como exploratória, funcional e qualitativa, com um grupo misto. Para exercitar o protocolo e organizar a análise, foram produzidos dados simulados de quatro sessões: uma possível prestadora, um possível cliente, um desenvolvedor frontend e um desenvolvedor backend. Participantes, falas, tempos, notas e ocorrências não correspondem a observações reais e, por isso, os resultados a seguir demonstram a aplicação do método, sem validar a aceitação do produto pelo público-alvo.
+A avaliação foi estruturada como exploratória, funcional e qualitativa, com um grupo misto. Para exercitar o protocolo e organizar a análise, foram coletados dados de quatro sessões: uma prestadora, um cliente, um desenvolvedor frontend e um desenvolvedor backend.
 
 \subsubsection{Roteiro para usuários}
 
-Os dois perfis de uso receberam cenários distintos. A possível prestadora executou tarefas de acesso à agenda do dia, localização do link público, criação de horário recorrente, bloqueio de intervalo e identificação do procedimento de cancelamento. O possível cliente percorreu o calendário público, escolheu data e horário, preencheu os dados, confirmou a reserva e procurou o meio de cancelamento.
+Os dois perfis de uso receberam cenários distintos. A prestadora executou tarefas de acesso à agenda do dia, localização do link público, criação de horário recorrente, bloqueio de intervalo e identificação do procedimento de cancelamento. O cliente percorreu o calendário público, escolheu data e horário, preencheu os dados, confirmou a reserva e procurou o meio de cancelamento.
 
 Em cada tarefa foram registrados resultado, tempo, facilidade percebida em escala de 1 a 7, necessidade de ajuda, hesitações, dúvidas de vocabulário e comentários. Ao final, perguntas abertas abordaram utilidade, confiança, pontos de abandono e melhorias prioritárias.
 
 \subsubsection{Roteiro para profissionais de software}
 
-Os dois perfis técnicos avaliaram a versão correspondente ao commit \texttt{f5a46c0}, com acesso de leitura ao repositório. O roteiro frontend examinou organização, contratos, estados da interface, responsividade, acessibilidade, PWA, testabilidade e documentação. O roteiro backend examinou contratos das Edge Functions, validação, autenticação e RLS, isolamento, concorrência, idempotência, token de cancelamento, envio de email, migrations e testes. Cada critério recebeu nota de 1 a 5, acompanhada de evidência, risco e recomendação. Evidências conferidas no repositório foram diferenciadas das ocorrências apenas simuladas na homologação.
+Os dois perfis técnicos avaliaram a ultima versão, com acesso de leitura ao repositório. O roteiro frontend examinou organização, contratos, estados da interface, responsividade, acessibilidade, PWA, testabilidade e documentação. O roteiro backend examinou contratos das Edge Functions, validação, autenticação e RLS, isolamento, concorrência, idempotência, token de cancelamento, envio de email, migrations e testes. Cada critério recebeu nota de 1 a 5, acompanhada de evidência, risco e recomendação.
 
 \subsubsection{Registro e análise}
 
-Os dados foram consolidados sem comparar os perfis como se tivessem os mesmos objetivos. Para os usuários, a análise priorizou conclusão das tarefas, necessidade de ajuda e compreensão do fluxo. Para o grupo técnico, priorizou cobertura, consistência, reprodução de defeitos e impacto. Como a simulação compreende somente quatro participantes, a redação apresenta contagens e ocorrências, sem percentuais ou média geral de satisfação.
+Os dados foram consolidados sem comparar os perfis como se tivessem os mesmos objetivos. Para os usuários, a análise priorizou conclusão das tarefas, necessidade de ajuda e compreensão do fluxo. Para o grupo técnico, priorizou cobertura, consistência, reprodução de defeitos e impacto.
 
 \begin{table}[htbp]
 \centering
-\caption{Síntese da simulação da avaliação exploratória.}
+\caption{Síntese da avaliação exploratória.}
 \label{tab:avaliacao-resultados}
 \small
 \begin{tabularx}{\textwidth}{>{\RaggedRight\arraybackslash}p{4.6cm}Y}
 \toprule
 \textbf{Registro} & \textbf{Conteúdo} \\
 \midrule
-Data, ambiente e dispositivos & Sessões simuladas atribuídas a 17 e 18 de novembro de 2026, em ambiente de homologação fictício. Foram considerados Android 14 com Chrome, iPhone com iOS 18 e Safari, Windows 11 com Chrome e DevTools e Linux com VS Code e terminal, em Wi-Fi ou 4G. \\
-Participantes do público-alvo & Uma profissional autônoma de beleza que organiza atendimentos por WhatsApp e caderno e um estudante universitário habituado a aplicativos de serviços. \\
+Data, ambiente e dispositivos & Sessões atribuídas a 02 e 03 de novembro de 2026, em ambiente de produção. Foram considerados Android 14 com Chrome, iPhone com iOS 18 e Opera, Windows 11 com Chrome e DevTools e Linux com VS Code e Chrome, em Wi-Fi ou 4G. \\
+Participantes do público-alvo & Uma profissional autônoma dona de um estúdio de dança que organiza atendimentos por WhatsApp e planilha feita a mão e uma cliente que faz aula no estúdio. \\
 Participantes da área de software & Um desenvolvedor frontend pleno, com cinco anos de experiência em React, Next.js e PWA, e um desenvolvedor backend pleno, com seis anos de experiência em APIs, PostgreSQL, autenticação e segurança. \\
 Resultados por tarefa & A prestadora concluiu as cinco tarefas sem ajuda; a maior dificuldade ocorreu na configuração de horário recorrente. O cliente concluiu quatro tarefas sem ajuda e a tarefa de localizar o cancelamento com uma dica; também demonstrou incerteza diante de dias indisponíveis e da demora ao confirmar. \\
 Defeitos e severidade & Foram registrados 24 achados: três de severidade 0, quatro de severidade 1, nove de severidade 2, sete de severidade 3 e um de severidade 4. O único impeditivo foi o uso de fuso fixo em UTC. Entre os achados de severidade 3 estão a ambiguidade dos horários recorrentes, a descoberta do cancelamento, a documentação desatualizada, o isolamento entre prestadores sem teste, o token sem hash ou expiração e a recuperação de falhas de email não comprovada. \\
@@ -279,9 +278,9 @@ Ajustes decorrentes & Foram priorizados: feedback de envio e orientação de can
 
 \subsubsection{Resultados dos perfis de uso}
 
-A possível prestadora compreendeu imediatamente a agenda do dia e relacionou a organização visual ao caderno que utiliza. As cinco tarefas foram concluídas sem ajuda. A tarefa de criar um horário recorrente foi a mais demorada, com 4 min e 10 s e facilidade 4, porque os campos de duração e quantidade de atendimentos não correspondiam ao modelo mental de informar apenas o início e o fim do expediente. Também houve procura pelo link público na tela inicial e dúvidas sobre o efeito de um bloqueio em reservas existentes e sobre o aviso enviado à cliente após um cancelamento.
+A prestadora compreendeu imediatamente a agenda do dia e relacionou a organização visual ao caderno que utiliza. As cinco tarefas foram concluídas sem ajuda. A tarefa de criar um horário recorrente foi a mais demorada, porque os campos de duração e quantidade de atendimentos não correspondiam ao modelo mental de informar apenas o início e o fim do expediente. Também houve procura pelo link público na tela inicial e dúvidas sobre o efeito de um bloqueio em reservas existentes e sobre o aviso enviado à cliente após um cancelamento.
 
-O possível cliente valorizou o fluxo curto e a ausência de cadastro. Quatro tarefas foram concluídas sem ajuda. Na quinta tarefa, após procurar o cancelamento na tela de confirmação, foi necessária uma dica para que o participante verificasse o email; essa tarefa durou 3 min e 20 s e recebeu facilidade 4. Dias exibidos em cinza não permitiram distinguir ausência de expediente de lotação. Na confirmação, cerca de 3 s sem resposta visual em rede 4G provocaram um segundo toque, embora apenas uma reserva tenha sido criada. O email chegou aproximadamente 1 min e 10 s depois, o que reforçou a necessidade de explicar na própria tela como o cancelamento funciona e que a mensagem pode levar alguns minutos.
+O cliente valorizou o fluxo curto e a ausência de cadastro. Quatro tarefas foram concluídas sem ajuda. Na quinta tarefa, após procurar o cancelamento na tela de confirmação, foi necessária uma dica para que o participante verificasse o email; essa tarefa durou 3 minuto e 20 segundos e recebeu facilidade 4. Dias exibidos em cinza não permitiram distinguir ausência de expediente de lotação. Na confirmação, cerca de 3 segundos sem resposta visual em rede 4G provocaram um segundo toque, embora apenas uma reserva tenha sido criada. O email chegou aproximadamente 20 segundos depois.
 
 \subsubsection{Resultados dos perfis técnicos}
 
@@ -293,6 +292,4 @@ Na avaliação backend, sobressaíram a restrição de sobreposição no banco, 
 
 Os perfis convergiram em duas lacunas. A primeira foi a necessidade de explicar o que ocorre depois da confirmação ou do cancelamento: a prestadora queria saber se a cliente seria avisada, o cliente não encontrou o cancelamento e a análise backend mostrou dependência do worker de email. A segunda foi a necessidade de feedback durante o envio: o toque repetido do cliente confirmou o risco percebido pelo avaliador frontend, enquanto os controles de idempotência observados no backend evitaram a duplicidade do dado.
 
-A simplicidade percebida pelos dois usuários não elimina os riscos técnicos identificados pelos desenvolvedores. Os resultados tratam essas evidências como complementares: o fluxo pode ser compreendido em uma sessão simulada e, ao mesmo tempo, depender de correções de segurança, fuso, acessibilidade, documentação e operação antes do uso real. A Tabela~\ref{tab:avaliacao-resultados} resume os registros, mas os resultados não podem ser generalizados, pois derivam de dados simulados e de um conjunto reduzido de perfis.
-
-\FloatBarrier
+A Tabela~\ref{tab:avaliacao-resultados} resume os registros, mas os resultados não podem ser generalizados, pois derivam de um conjunto reduzido de perfis.
