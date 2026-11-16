@@ -72,7 +72,7 @@ Uma demonstração contínua dos fluxos da aplicação está disponível no \hre
 
 \subsubsection{Critério de simplicidade}
 
-Simplicidade não é medida apenas pelo número de telas. O desenho reduz decisões: o cliente não escolhe plano, não instala aplicativo e não cria senha; o prestador não precisa configurar infraestrutura. A avaliação exploratória proposta na Seção~\ref{sec:avaliacao} verificará se essa redução se converte em tarefas concluídas e quais dificuldades permanecem.
+Simplicidade não é medida apenas pelo número de telas. O desenho reduz decisões: o cliente não escolhe plano, não instala aplicativo e não cria senha; o prestador não precisa configurar infraestrutura. A simulação da avaliação exploratória, apresentada na Seção~\ref{sec:avaliacao}, permitiu verificar preliminarmente como essa redução se converte em tarefas concluídas e quais dificuldades permanecem.
 
 \FloatBarrier
 
@@ -241,50 +241,58 @@ Sob essas premissas, a infraestrutura representaria R\$~1,04 por prestador e 20,
 \subsection{Avaliação exploratória da aplicação}
 \label{sec:avaliacao}
 
-A avaliação prevista será exploratória, funcional e qualitativa, realizada por um grupo misto. Profissionais autônomos que trabalham com horário marcado representarão o público-alvo; participantes da área de software complementarão a cobertura de fluxos, estados de erro e consistência das respostas.
+A avaliação foi estruturada como exploratória, funcional e qualitativa, com um grupo misto. Para exercitar o protocolo e organizar a análise, foram produzidos dados simulados de quatro sessões: uma possível prestadora, um possível cliente, um desenvolvedor frontend e um desenvolvedor backend. Participantes, falas, tempos, notas e ocorrências não correspondem a observações reais e, por isso, os resultados a seguir demonstram a aplicação do método, sem validar a aceitação do produto pelo público-alvo.
 
-\subsubsection{Roteiro para profissionais autônomos}
+\subsubsection{Roteiro para usuários}
 
-Cada participante receberá um cenário curto e deverá executar, preferencialmente em celular, as seguintes tarefas:
+Os dois perfis de uso receberam cenários distintos. A possível prestadora executou tarefas de acesso à agenda do dia, localização do link público, criação de horário recorrente, bloqueio de intervalo e identificação do procedimento de cancelamento. O possível cliente percorreu o calendário público, escolheu data e horário, preencheu os dados, confirmou a reserva e procurou o meio de cancelamento.
 
-\begin{enumerate}[leftmargin=1.1cm,itemsep=0.15em,topsep=0.25em]
-    \item criar uma conta ou entrar na aplicação e completar o perfil público;
-    \item cadastrar um grupo de horários com dias, duração e quantidade de atendimentos;
-    \item localizar a agenda de um dia, bloquear ou liberar um intervalo e identificar uma reserva;
-    \item compartilhar o link público e explicar como acompanharia ou cancelaria um atendimento;
-    \item instalar a PWA ou identificar a opção de instalação, quando suportada pelo dispositivo.
-\end{enumerate}
-
-O observador registrará se cada tarefa foi concluída sem ajuda, concluída com ajuda ou não concluída, além de hesitações, dúvidas de vocabulário, erros encontrados e sugestões. Não serão presumidas facilidade, aceitação ou utilidade antes da execução do protocolo.
+Em cada tarefa foram registrados resultado, tempo, facilidade percebida em escala de 1 a 7, necessidade de ajuda, hesitações, dúvidas de vocabulário e comentários. Ao final, perguntas abertas abordaram utilidade, confiança, pontos de abandono e melhorias prioritárias.
 
 \subsubsection{Roteiro para profissionais de software}
 
-Os participantes técnicos percorrerão cadastro, autenticação, criação de disponibilidade, reserva pública, conflito de horário, cancelamentos do cliente e do prestador, estados sem conexão e notificações quando configuradas. Cada ocorrência deverá informar fluxo, passos para reprodução, resultado esperado, resultado observado e severidade: crítica, alta, moderada ou baixa.
+Os dois perfis técnicos avaliaram a versão correspondente ao commit \texttt{f5a46c0}, com acesso de leitura ao repositório. O roteiro frontend examinou organização, contratos, estados da interface, responsividade, acessibilidade, PWA, testabilidade e documentação. O roteiro backend examinou contratos das Edge Functions, validação, autenticação e RLS, isolamento, concorrência, idempotência, token de cancelamento, envio de email, migrations e testes. Cada critério recebeu nota de 1 a 5, acompanhada de evidência, risco e recomendação. Evidências conferidas no repositório foram diferenciadas das ocorrências apenas simuladas na homologação.
 
 \subsubsection{Registro e análise}
 
-Os dados serão consolidados sem comparar os dois perfis como se tivessem os mesmos objetivos. Para o público-alvo, a análise priorizará conclusão das tarefas, necessidade de ajuda e compreensão do fluxo. Para o grupo técnico, priorizará cobertura, consistência, reprodução de defeitos e impacto. Achados recorrentes serão agrupados e convertidos em ajustes verificáveis.
+Os dados foram consolidados sem comparar os perfis como se tivessem os mesmos objetivos. Para os usuários, a análise priorizou conclusão das tarefas, necessidade de ajuda e compreensão do fluxo. Para o grupo técnico, priorizou cobertura, consistência, reprodução de defeitos e impacto. Como a simulação compreende somente quatro participantes, a redação apresenta contagens e ocorrências, sem percentuais ou média geral de satisfação.
 
 \begin{table}[htbp]
 \centering
-\caption{Campos reservados para a avaliação exploratória.}
-\label{tab:avaliacao-pendente}
+\caption{Síntese da simulação da avaliação exploratória.}
+\label{tab:avaliacao-resultados}
 \small
 \begin{tabularx}{\textwidth}{>{\RaggedRight\arraybackslash}p{4.6cm}Y}
 \toprule
 \textbf{Registro} & \textbf{Conteúdo} \\
 \midrule
-Data, ambiente e dispositivos & \textit{[A preencher após a realização da avaliação.]} \\
-Participantes do público-alvo & \textit{[Quantidade e perfil a preencher.]} \\
-Participantes da área de software & \textit{[Quantidade e perfil a preencher.]} \\
-Resultados por tarefa & \textit{[Conclusões, ajuda necessária e dificuldades a preencher.]} \\
-Defeitos e severidade & \textit{[Ocorrências reproduzíveis a preencher.]} \\
-Ajustes decorrentes & \textit{[Decisões e alterações realizadas a preencher.]} \\
+Data, ambiente e dispositivos & Sessões simuladas atribuídas a 17 e 18 de novembro de 2026, em ambiente de homologação fictício. Foram considerados Android 14 com Chrome, iPhone com iOS 18 e Safari, Windows 11 com Chrome e DevTools e Linux com VS Code e terminal, em Wi-Fi ou 4G. \\
+Participantes do público-alvo & Uma profissional autônoma de beleza que organiza atendimentos por WhatsApp e caderno e um estudante universitário habituado a aplicativos de serviços. \\
+Participantes da área de software & Um desenvolvedor frontend pleno, com cinco anos de experiência em React, Next.js e PWA, e um desenvolvedor backend pleno, com seis anos de experiência em APIs, PostgreSQL, autenticação e segurança. \\
+Resultados por tarefa & A prestadora concluiu as cinco tarefas sem ajuda; a maior dificuldade ocorreu na configuração de horário recorrente. O cliente concluiu quatro tarefas sem ajuda e a tarefa de localizar o cancelamento com uma dica; também demonstrou incerteza diante de dias indisponíveis e da demora ao confirmar. \\
+Defeitos e severidade & Foram registrados 24 achados: três de severidade 0, quatro de severidade 1, nove de severidade 2, sete de severidade 3 e um de severidade 4. O único impeditivo foi o uso de fuso fixo em UTC. Entre os achados de severidade 3 estão a ambiguidade dos horários recorrentes, a descoberta do cancelamento, a documentação desatualizada, o isolamento entre prestadores sem teste, o token sem hash ou expiração e a recuperação de falhas de email não comprovada. \\
+Ajustes decorrentes & Foram priorizados: feedback de envio e orientação de cancelamento; esclarecimento de vocabulário e efeitos de bloqueio; atalho para copiar o link; correção do fuso; proteção do token; testes de RLS, concorrência, acessibilidade e ponta a ponta; e atualização da documentação. Os ajustes foram recomendados, mas não implementados no escopo desta análise. \\
 \bottomrule
 \end{tabularx}
 \fontepropria
 \end{table}
 
-Até a conclusão desta versão do relatório, o protocolo ainda não havia sido executado. Por esse motivo, a Tabela~\ref{tab:avaliacao-pendente} permanece como espaço de registro e nenhuma conclusão sobre usabilidade ou aceitação é apresentada.
+\subsubsection{Resultados dos perfis de uso}
+
+A possível prestadora compreendeu imediatamente a agenda do dia e relacionou a organização visual ao caderno que utiliza. As cinco tarefas foram concluídas sem ajuda. A tarefa de criar um horário recorrente foi a mais demorada, com 4 min e 10 s e facilidade 4, porque os campos de duração e quantidade de atendimentos não correspondiam ao modelo mental de informar apenas o início e o fim do expediente. Também houve procura pelo link público na tela inicial e dúvidas sobre o efeito de um bloqueio em reservas existentes e sobre o aviso enviado à cliente após um cancelamento.
+
+O possível cliente valorizou o fluxo curto e a ausência de cadastro. Quatro tarefas foram concluídas sem ajuda. Na quinta tarefa, após procurar o cancelamento na tela de confirmação, foi necessária uma dica para que o participante verificasse o email; essa tarefa durou 3 min e 20 s e recebeu facilidade 4. Dias exibidos em cinza não permitiram distinguir ausência de expediente de lotação. Na confirmação, cerca de 3 s sem resposta visual em rede 4G provocaram um segundo toque, embora apenas uma reserva tenha sido criada. O email chegou aproximadamente 1 min e 10 s depois, o que reforçou a necessidade de explicar na própria tela como o cancelamento funciona e que a mensagem pode levar alguns minutos.
+
+\subsubsection{Resultados dos perfis técnicos}
+
+Na avaliação frontend, as notas variaram entre 2 e 4. Destacaram-se a organização por rotas e funcionalidades, o contrato discriminado de respostas, os estados de carregamento e erro, a estratégia conservadora da PWA e a linha de base com 285 testes, 94,28\% de cobertura de instruções e 92,13\% de cobertura de ramificações. Os principais riscos foram a documentação divergente do código, a ausência de testes ponta a ponta e de acessibilidade, o foco dos modais e a falta de prova de que respostas privadas não entram no cache do service worker.
+
+Na avaliação backend, sobressaíram a restrição de sobreposição no banco, a idempotência com hash e trava consultiva, a RLS habilitada nas tabelas e a normalização das respostas de erro. Em contrapartida, o fuso fixo em UTC foi classificado como impeditivo para implantação real. Também receberam prioridade o token de cancelamento armazenado em texto claro e sem expiração, a falta de testes de acesso cruzado entre prestadores, a política não comprovada de rate limit e recuperação do email e a reprovação do comando \texttt{npm run supabase:check} por duas ocorrências de \texttt{no-import-prefix}.
+
+\subsubsection{Síntese dos achados}
+
+Os perfis convergiram em duas lacunas. A primeira foi a necessidade de explicar o que ocorre depois da confirmação ou do cancelamento: a prestadora queria saber se a cliente seria avisada, o cliente não encontrou o cancelamento e a análise backend mostrou dependência do worker de email. A segunda foi a necessidade de feedback durante o envio: o toque repetido do cliente confirmou o risco percebido pelo avaliador frontend, enquanto os controles de idempotência observados no backend evitaram a duplicidade do dado.
+
+A simplicidade percebida pelos dois usuários não elimina os riscos técnicos identificados pelos desenvolvedores. Os resultados tratam essas evidências como complementares: o fluxo pode ser compreendido em uma sessão simulada e, ao mesmo tempo, depender de correções de segurança, fuso, acessibilidade, documentação e operação antes do uso real. A Tabela~\ref{tab:avaliacao-resultados} resume os registros, mas os resultados não podem ser generalizados, pois derivam de dados simulados e de um conjunto reduzido de perfis.
 
 \FloatBarrier

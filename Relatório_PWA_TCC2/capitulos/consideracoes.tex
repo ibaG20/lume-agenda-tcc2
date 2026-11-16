@@ -10,12 +10,15 @@ As decisões técnicas reforçam esse escopo. A confirmação da reserva ocorre 
 
 A simulação econômica indica que a mensalidade hipotética de R\$~5,00 pode cobrir a infraestrutura considerada no cenário estabelecido. A conclusão é condicional: demanda, consumo, tributos, suporte e demais custos ainda precisam ser observados antes de qualquer afirmação sobre sustentabilidade comercial.
 
-A avaliação exploratória, com profissionais autônomos e participantes da área de software, permanece pendente. O protocolo e os campos de registro foram definidos na Seção~\ref{sec:avaliacao}, mas nenhum resultado de usabilidade, aceitação ou cobertura exploratória é afirmado nesta versão.
+A simulação da avaliação exploratória mostrou que os fluxos essenciais podem ser concluídos pelos dois perfis de uso considerados, mas revelou lacunas de comunicação e previsibilidade. A possível prestadora concluiu as cinco tarefas sem ajuda, com maior dificuldade na configuração de horários recorrentes. O possível cliente concluiu quatro tarefas sem ajuda e precisou de uma dica para localizar o cancelamento enviado por email. A ausência de retorno imediato na confirmação, a ambiguidade dos dias indisponíveis e a falta de explicação sobre os efeitos de bloqueios e cancelamentos concentraram os principais problemas de interação.
+
+Os perfis técnicos complementaram essa percepção. A arquitetura apresentou controles relevantes de integridade, como prevenção de sobreposição, idempotência e RLS, além de uma base expressiva de testes. Entretanto, foram identificados riscos incompatíveis com uma implantação real sem correções, sobretudo o fuso fixo em UTC, o token de cancelamento sem hash e expiração, a ausência de prova de isolamento entre prestadores e as lacunas na recuperação de falhas de email. Portanto, a simulação oferece evidência preliminar sobre o protocolo e as prioridades de melhoria, mas não comprova aceitação ou adequação do produto por participantes reais.
 
 \subsection{Limitações}
 
 \begin{itemize}
-    \item a avaliação exploratória ainda não foi executada, portanto permanecem pendentes dados de conclusão de tarefas, dificuldades, defeitos e adequação ao cotidiano dos prestadores;
+    \item a avaliação exploratória foi exercitada com dados simulados de apenas quatro perfis; participantes, falas, tempos e ocorrências não são observações reais e não permitem generalizar resultados nem confirmar adequação ao cotidiano dos prestadores;
+    \item parte das evidências técnicas foi conferida no repositório, enquanto outras ocorrências foram simuladas na homologação; os riscos prioritários ainda precisam de reprodução e testes específicos;
     \item os custos foram calculados com preços publicados, câmbio e demanda hipotéticos, sem incluir todas as despesas operacionais;
     \item o funcionamento depende de serviços externos de hospedagem, autenticação, cache e comunicação, cuja disponibilidade e cobrança podem variar;
     \item a versão atual é orientada à agenda de um prestador, sem gestão conjunta de vários profissionais no mesmo estabelecimento;
@@ -24,12 +27,14 @@ A avaliação exploratória, com profissionais autônomos e participantes da ár
 
 \subsection{Trabalhos futuros}
 
-A próxima etapa é executar o protocolo exploratório, consolidar os resultados nos campos reservados e priorizar ajustes a partir de dificuldades e defeitos reproduzíveis. A avaliação deverá preservar a distinção entre a percepção do público-alvo e a cobertura técnica realizada pelos profissionais de software.
+A próxima etapa é repetir o protocolo com participantes reais do público-alvo e da área de software, mantendo a distinção entre percepção de uso e cobertura técnica. A nova rodada deverá verificar se os achados simulados reaparecem, registrar defeitos reproduzíveis e reavaliar os fluxos depois das correções.
+
+Antes de ampliar o escopo funcional, devem ser priorizados o tratamento correto de fuso por prestador, a proteção e expiração do token de cancelamento, os testes de isolamento, RLS e concorrência, a recuperação de falhas de email e a correção do gate do backend. Na interface, as prioridades são o feedback de envio, a orientação de cancelamento, a diferenciação dos estados do calendário, a explicação dos horários recorrentes e os testes de acessibilidade e ponta a ponta.
 
 No desenvolvimento funcional, duas evoluções são prioritárias. A primeira é permitir que \textbf{mais de um profissional cadastre e administre seus próprios horários em um mesmo estabelecimento}, com agendas independentes, escolha do profissional no fluxo de reserva e prevenção de conflitos de disponibilidade. A segunda é \textbf{possibilitar o pagamento pelo próprio sistema}, mediante integração com um provedor de pagamentos, contemplando confirmação de transações, estados de pagamento, cancelamentos e tratamento seguro das informações financeiras.
 
 Como desdobramentos complementares, podem ser considerados reagendamento, lembretes automáticos e relatórios essenciais. A priorização dessas funcionalidades deverá considerar os resultados da avaliação exploratória e os custos reais de manutenção, preservando a simplicidade que orienta o projeto.
 
-Conclui-se que a versão implementada oferece uma base coerente com a proposta de ampliar o acesso ao agendamento digital: escopo funcional reduzido, reserva autônoma pelo cliente e atenção ao custo mensal de operação. A confirmação de sua adequação ao público dependerá da avaliação planejada e da incorporação dos achados ao produto.
+Conclui-se que a versão implementada oferece uma base coerente com a proposta de ampliar o acesso ao agendamento digital: escopo funcional reduzido, reserva autônoma pelo cliente e atenção ao custo mensal de operação. A simulação indica que a simplicidade do fluxo pode ser percebida pelos usuários, mas também evidencia problemas de previsibilidade e riscos técnicos que precisam ser corrigidos. A adequação ao público somente poderá ser confirmada após avaliação com participantes reais, implementação das melhorias prioritárias e nova verificação dos fluxos críticos.
 
 \FloatBarrier
